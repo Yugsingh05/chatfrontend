@@ -1,10 +1,191 @@
 @import "tailwindcss";
+/* Custom Background Image *
 
+/* Main styles based on Tailwind config */
 
-/* optional dark theme base */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #0a0a0a;
-    color: #ededed;
-  }
+:root {
+  /* Colors */
+  --secondary: #8696a0;
+  --teal-light: #7ae3c3;
+  --photopicker-overlay-background: rgba(30, 42, 49, 0.8);
+  --dropdown-background: #233138;
+  --dropdown-background-hover: #182229;
+  --input-background: #2a3942;
+  --primary-strong: #e9edef;
+  --panel-header-background: #202c33;
+  --panel-header-icon: #aebac1;
+  --icon-lighter: #8696a0;
+  --icon-green: #00a884;
+  --search-input-container-background: #111b21;
+  --conversation-border: rgba(134, 150, 160, 0.15);
+  --conversation-panel-background: #0b141a;
+  --background-default-hover: #202c33;
+  --incoming-background: #202c33;
+  --outgoing-background: #005c4b;
+  --bubble-meta: hsla(0, 0%, 100%, 0.6);
+  --icon-ack: #53bdeb;
+}
+
+/* Background Images */
+.bg-chat-background {
+  background-image: url('/chat-bg.png');
+}
+
+/* Color Classes */
+.text-secondary {
+  color: var(--secondary);
+}
+
+.text-teal-light {
+  color: var(--teal-light);
+}
+
+.text-primary-strong {
+  color: var(--primary-strong);
+}
+
+.text-panel-header-icon {
+  color: var(--panel-header-icon);
+}
+
+.text-icon-lighter {
+  color: var(--icon-lighter);
+}
+
+.text-icon-green {
+  color: var(--icon-green);
+}
+
+.text-bubble-meta {
+  color: var(--bubble-meta);
+}
+
+.text-icon-ack {
+  color: var(--icon-ack);
+}
+
+/* Background Color Classes */
+.bg-photopicker-overlay-background {
+  background-color: var(--photopicker-overlay-background);
+}
+
+.bg-dropdown-background {
+  background-color: var(--dropdown-background);
+}
+
+.bg-dropdown-background-hover {
+  background-color: var(--dropdown-background-hover);
+}
+
+.bg-input-background {
+  background-color: var(--input-background);
+}
+
+.bg-panel-header-background {
+  background-color: var(--panel-header-background);
+}
+
+.bg-search-input-container-background {
+  background-color: var(--search-input-container-background);
+}
+
+.bg-conversation-panel-background {
+  background-color: var(--conversation-panel-background);
+}
+
+.bg-background-default-hover {
+  background-color: var(--background-default-hover);
+}
+
+.bg-incoming-background {
+  background-color: var(--incoming-background);
+}
+
+.bg-outgoing-background {
+  background-color: var(--outgoing-background);
+}
+
+/* Border Classes */
+.border-conversation-border {
+  border-color: var(--conversation-border);
+}
+
+/* Grid Layout */
+.grid-cols-main {
+  grid-template-columns: 1fr 2.4fr;
+}
+
+/* Hover States */
+.hover\:bg-dropdown-background-hover:hover {
+  background-color: var(--dropdown-background-hover);
+}
+
+.hover\:bg-background-default-hover:hover {
+  background-color: var(--background-default-hover);
+}
+
+/* Utility Classes */
+.chat-bubble {
+  max-width: 65%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+.incoming-message {
+  background-color: var(--incoming-background);
+  align-self: flex-start;
+}
+
+.outgoing-message {
+  background-color: var(--outgoing-background);
+  align-self: flex-end;
+}
+
+.message-meta {
+  font-size: 0.75rem;
+  color: var(--bubble-meta);
+  text-align: right;
+}
+
+/* Panel Styling */
+.panel-header {
+  background-color: var(--panel-header-background);
+  padding: 10px 16px;
+}
+
+.search-input-container {
+  background-color: var(--search-input-container-background);
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.input-field {
+  background-color: var(--input-background);
+  border: none;
+  border-radius: 8px;
+  padding: 9px 12px;
+  color: var(--primary-strong);
+}
+
+.conversation-item {
+  border-bottom: 1px solid var(--conversation-border);
+  padding: 10px 15px;
+}
+
+.conversation-item:hover {
+  background-color: var(--background-default-hover);
+}
+
+/* Icon Styling */
+.icon {
+  color: var(--icon-lighter);
+}
+
+.icon-active {
+  color: var(--icon-green);
+}
+
+.icon-read {
+  color: var(--icon-ack);
 }
