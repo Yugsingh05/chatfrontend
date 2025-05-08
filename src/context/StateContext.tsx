@@ -4,7 +4,7 @@ import { createContext, useContext, useState } from "react";
 
 export const StateContext = createContext({});
 
-type user = {
+export type user = {
     name : string,
     email : string,
     profileImage : string
