@@ -1,8 +1,10 @@
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { FaCamera } from "react-icons/fa";
 import ContextMenu from "./ContextMenu";
+import { read } from "fs";
+import PhotoPicker from "./PhotoPicker";
 
 type AvatarPTops = {
   type: string;
@@ -11,12 +13,26 @@ type AvatarPTops = {
 };
 const Avatar = ({ type, image, setImage }: AvatarPTops) => {
   const [hover, setHover] = useState(false);
-
+  const [grabPhoto, setGrabPhoto] = useState(false);
   const [isContextMenuVisible, setIsContextMenuVisible] = useState(false);
   const [contextMenuCordinates, setContextMenuCordinates] = useState({
     x: 0,
     y: 0,
   });
+
+
+  useEffect(() => {
+    if(grabPhoto){
+      const data = document.getElementById("photo-picker");
+      data?.click();
+      document.body.onfocus = (e) => {
+        setTimeout(() => {
+          setGrabPhoto(false);
+        },1000)
+      }
+    }
+  },[grabPhoto]);
+
 
   const showContextMenu = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -24,7 +40,35 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
     setIsContextMenuVisible(true);
   };
 
-  const contextMenuOptions = [{ name: "Change Photo", callback: () => {} }];
+  const contextMenuOptions = [
+    { name: "Change Photo", callback: () => { } },
+    { name: "Choose from library", callback: () => { } },
+    { name: "Upload Photo", callback: () => { 
+      setGrabPhoto(true);
+    } },
+    {
+      name: "Remove Photo",
+      callback: () => {
+        setImage("/default_avatar.png");
+      },
+    },
+  ];
+
+
+  const photoPickerChange = async(e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    const data = document.createElement("img");
+    reader.onload = function (event) {
+      data.src = event.target?.result;
+      data.setAttribute("data-src",event.target?.result);
+    };
+    reader.readAsDataURL(file);
+    setTimeout(() => {
+      setImage(data.src);
+    },100)
+
+  }
 
   return (
     <>
@@ -46,10 +90,10 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
             onMouseLeave={() => setHover(false)}
           >
             <div
-              className={`z-10 bg-photopicker-overlay-background absolute h-60 w-60 flex items-center justify-center 
-                         top-0 left-0 rounded-full flex-col text-center gap-2 ${
-                           hover ? "visible" : "hidden"
-                         }`}
+              className={`z-10 bg-photopicker-overlay-background absolute h-60 w-60 flex items-center 
+                 justify-center 
+                         top-0 left-0 rounded-full flex-col text-center gap-2 ${hover ? "visible" : "hidden"
+                }`}
               onClick={(e) => showContextMenu(e)}
               id="context-opener"
             >
@@ -81,6 +125,8 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
           setContextMenu={setIsContextMenuVisible}
         />
       )}
+      {grabPhoto &&<PhotoPicker
+      onChange={photoPickerChange}/>}
     </>
   );
 };

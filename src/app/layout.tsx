@@ -29,7 +29,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
 
-        <StateProvider>{children}</StateProvider>
+        <StateProvider>{children}
+          <div id="photo-picker-element"></div>
+        </StateProvider>
+
 
       </body>
     </html>
