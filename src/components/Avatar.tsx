@@ -5,6 +5,7 @@ import { FaCamera } from "react-icons/fa";
 import ContextMenu from "./ContextMenu";
 import { read } from "fs";
 import PhotoPicker from "./PhotoPicker";
+import PhotoLibrary from "./PhotoLibrary";
 
 type AvatarPTops = {
   type: string;
@@ -19,6 +20,7 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
     x: 0,
     y: 0,
   });
+  const [showLibrary, setShowLibrary] = useState(false);
 
 
   useEffect(() => {
@@ -42,7 +44,9 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
 
   const contextMenuOptions = [
     { name: "Change Photo", callback: () => { } },
-    { name: "Choose from library", callback: () => { } },
+    { name: "Choose from library", callback: () => { 
+      setShowLibrary(true);
+    } },
     { name: "Upload Photo", callback: () => { 
       setGrabPhoto(true);
     } },
@@ -125,6 +129,7 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
           setContextMenu={setIsContextMenuVisible}
         />
       )}
+      {showLibrary &&  <PhotoLibrary setImage={setImage} setShowLibrary={setShowLibrary}   />}
       {grabPhoto &&<PhotoPicker
       onChange={photoPickerChange}/>}
     </>
