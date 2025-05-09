@@ -27,14 +27,27 @@ const Page = () => {
       if (email) {
         const { data } = await axios.post(CHECK_USER_ROUTE, { email });
         console.log(data)
-        if (!data.status)
+        if (!data.status){
           setData({
             name: displayName,
             email,
             profileImage: photoURL,
             status: false,
+            
+          
           })
-        router.push("/register")
+        router.push("/register")}
+        else {
+          setData({
+            name: displayName,
+            email,
+            profileImage: photoURL,
+            status: true,
+            about : data.data.about,
+            isNewUser : false
+          })
+          router.push("/")
+        }
       }
 
     } catch (error) {

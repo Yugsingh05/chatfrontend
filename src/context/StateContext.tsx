@@ -7,7 +7,8 @@ export const StateContext = createContext({});
 export type user = {
     name : string,
     email : string,
-    profileImage : string
+    profileImage : string,
+    about : string,
     status : boolean,
     isNewUser : boolean
 
@@ -17,6 +18,7 @@ export const StateProvider = ({children} : {children : React.ReactNode})  => {
         name : "",
         email : "",
         profileImage : "",
+        about : "",
         status : false,
         isNewUser : true
     });
