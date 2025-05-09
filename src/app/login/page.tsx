@@ -8,13 +8,17 @@ import { FcGoogle } from "react-icons/fc"
 import axios from "axios"
 import { CHECK_USER_ROUTE } from '@/utils/ApiRoutes'
 import { useRouter } from 'next/navigation';
-import { useStateProvider } from '@/context/StateContext';
+import {  useStateProvider } from '@/context/StateContext';
 
 
 const Page = () => {
 
   const router = useRouter();
-  const { data, setData } = useStateProvider()
+  const { setData } = useStateProvider();
+  if (!setData) {
+    throw new Error("setData is not defined in StateContext");
+  }
+
 
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
@@ -32,9 +36,7 @@ const Page = () => {
             name: displayName,
             email,
             profileImage: photoURL,
-            status: false,
-            
-          
+            status: false, 
           })
         router.push("/register")}
         else {

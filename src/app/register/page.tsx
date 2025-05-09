@@ -9,10 +9,10 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 const Register = () => {
-  const { data,setData }: { data: user } = useStateProvider();
+  const { data,setData }: { data: user , setData : React.Dispatch<React.SetStateAction<user>> } = useStateProvider();
   const [name, setName] = useState(data?.name || "");
-  const [about, setAbout] = useState(data?.email || "");
-  const [image, setImage] = useState("/default_avatar.png");
+  const [about, setAbout] = useState("");
+  const [image, setImage] = useState( data?.profileImage || "/default_avatar.png");
   const router = useRouter();
 
   useEffect(() => {
