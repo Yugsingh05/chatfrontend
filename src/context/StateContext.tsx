@@ -5,6 +5,7 @@ import { createContext, useContext, useState } from "react";
 export const StateContext = createContext({});
 
 export type user = {
+    id : string,
     name : string,
     email : string,
     profileImage : string,
@@ -15,6 +16,7 @@ export type user = {
 }
 export const StateProvider = ({children} : {children : React.ReactNode})  => {
     const [data,setData] = useState<user>({
+        id :"",
         name : "",
         email : "",
         profileImage : "",

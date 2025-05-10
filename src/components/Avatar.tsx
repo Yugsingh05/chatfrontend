@@ -62,6 +62,8 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
     },
   ];
 
+  
+
 
   const photoPickerChange = async(e) => {
     const file = e.target.files[0];
@@ -78,6 +80,7 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
 
   }
 
+  if(!image) return null
   return (
     <>
       <div className="flex items-center justify-center">

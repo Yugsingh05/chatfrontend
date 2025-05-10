@@ -7,17 +7,17 @@ interface ContextMenuProps {
   setContextMenu: (value: boolean) => void;
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = ({ options, cordinates, contextMenu, setContextMenu }) => {
+const ContextMenu: React.FC<ContextMenuProps> = ({ options, cordinates, setContextMenu }) => {
   const contextMenuRef = useRef(null);
 
-  const handleClick = (e, callback) => {
+  const handleClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>, callback: { (): void; (): void; }) => {
     e.stopPropagation();
     callback();
     setContextMenu(false);
   };
 
   useEffect(() => {
-    const handleOutSideClick = (event) => {
+    const handleOutSideClick = (event: { target: { id: string; }; }) => {
       if(event.target.id !== "context-opener"){
         if(
           contextMenuRef.current &&
