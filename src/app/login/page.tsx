@@ -3,7 +3,7 @@
 import { firebaseAuth } from '@/utils/firebaseconfig'
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import Image from 'next/image'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FcGoogle } from "react-icons/fc"
 import axios from "axios"
 import { CHECK_USER_ROUTE } from '@/utils/ApiRoutes'
@@ -14,11 +14,17 @@ import {  useStateProvider } from '@/context/StateContext';
 const Page = () => {
 
   const router = useRouter();
-  const { setData } = useStateProvider();
+  const {data, setData } = useStateProvider();
   if (!setData) {
     throw new Error("setData is not defined in StateContext");
   }
 
+  useEffect(() => {
+    console.log("data", data);
+    if(data.email){
+      router.push("/")
+    }
+  })
 
   const handleLogin = async () => {
     const provider = new GoogleAuthProvider();
