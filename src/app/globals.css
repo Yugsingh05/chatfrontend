@@ -189,3 +189,12 @@
 .icon-read {
   color: var(--icon-ack);
 }
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb{
+  background-color: #ffffff3b;
+}
