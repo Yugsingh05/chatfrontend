@@ -1,4 +1,5 @@
 "use client";
+import Chat from "@/components/Chat/Chat";
 import ChatList from "@/components/ChatList";
 import Empty from "@/components/Empty";
 import { useStateProvider } from "@/context/StateContext";
@@ -49,7 +50,8 @@ export default function Home() {
   return (
     <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen overflow-hidden">
       <ChatList />
-      <Empty />
+      {/* <Empty /> */}
+      <Chat/>
     </div>
   );
 }
