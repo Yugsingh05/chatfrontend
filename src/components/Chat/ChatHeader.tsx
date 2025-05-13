@@ -1,21 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from "../Avatar";
 import { IoVideocam } from "react-icons/io5";
 import { BiSearchAlt2 } from "react-icons/bi";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdCall } from "react-icons/md";
+import { useChatReducer } from "@/context/ChatContext";
+import { user } from "@/context/StateContext";
 
 const ChatHeader = () => {
+  const {currentChatUser,setCurrentChatUser} = useChatReducer();
+  const[dataOfUser,setDataOfUser] = useState<user | null>(null);
+  
+  useEffect(() => {console.log(currentChatUser);
+    setDataOfUser(currentChatUser);
+  },[currentChatUser])
+
+
   return (
     <div className="h-16 px-4 py-3 flex justify-between items-center bg-panel-header-background z-10">
       <div className="flex items-center justify-center gap-6">
         <Avatar
           type="sm"
-          image="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png"
+        image={dataOfUser?.profileImage || "/default_avatar.png"}
           setImage={() => {}}
         />
         <div className="flex flex-col">
-          <span className="text-primary-strong">Demo</span>
+          <span className="text-primary-strong">{dataOfUser?.name || "User"}</span>
           <span className="text-secondary text-sm">Online/offline</span>
         </div>
       </div>

@@ -2,6 +2,7 @@
 import Chat from "@/components/Chat/Chat";
 import ChatList from "@/components/ChatList";
 import Empty from "@/components/Empty";
+import { useChatReducer } from "@/context/ChatContext";
 import { useStateProvider } from "@/context/StateContext";
 import { CHECK_USER_ROUTE } from "@/utils/ApiRoutes";
 import { firebaseAuth } from "@/utils/firebaseconfig";
@@ -13,6 +14,7 @@ import { useEffect } from "react";
 export default function Home() {
   const { data, setData } = useStateProvider();
   const router = useRouter();
+  const {currentChatUser,setCurrentChatUser} = useChatReducer();
 
   
 
@@ -20,7 +22,7 @@ export default function Home() {
     <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen overflow-hidden">
       <ChatList />
       {/* <Empty /> */}
-      <Chat/>
+      {currentChatUser ? <Chat /> : <Empty />}
     </div>
   );
 }
