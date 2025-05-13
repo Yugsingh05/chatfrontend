@@ -5,3 +5,5 @@ const AUTH_ROUTES = `${HOST}/api/auth`
 export const CHECK_USER_ROUTE = `${AUTH_ROUTES}/check-user`
 
 export const REGISTER_USER_ROUTE = `${AUTH_ROUTES}/register-user`
+
+export const GET_ALL_CONTACTS_ROUTE = `${AUTH_ROUTES}/get-all-contacts`
