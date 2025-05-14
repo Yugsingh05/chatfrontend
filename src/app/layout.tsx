@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { StateProvider } from "@/context/StateContext";
 import { ChatContextProvider } from "@/context/ChatContext";
+import { SocketContextProvider } from "@/context/SocketContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,11 +31,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <StateProvider>
-          <ChatContextProvider>
-            {children}
-
-            <div id="photo-picker-element"></div>
-          </ChatContextProvider>
+          <SocketContextProvider>
+            <ChatContextProvider>
+              {children}
+              <div id="photo-picker-element"></div>
+            </ChatContextProvider>
+          </SocketContextProvider>
         </StateProvider>
       </body>
     </html>

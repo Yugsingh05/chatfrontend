@@ -7,11 +7,14 @@ import axios from "axios";
 import { ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import { useChatReducer } from "@/context/ChatContext";
 import { useStateProvider } from "@/context/StateContext";
+import { useSocketReducer } from "@/context/SocketContext";
 
 const MessageBar = () => {
   const [message, SetMessage] = useState("");
   const { currentChatUser } = useChatReducer();
   const { data } = useStateProvider();
+
+  const {ContextSocket} = useSocketReducer();
 
   const handleSend = async () => {
     if (!message) return;
@@ -28,9 +31,15 @@ const MessageBar = () => {
 
       console.log(res.data);
 
-      if (res.data.status) {  
+      if (res.data.status) { 
+        
+        ContextSocket.emit("send-msg",{
+          to : currentChatUser.id,
+          from : data.id,
+          message : res.data.msg
+        })
         SetMessage("");
-        alert("Message sent successfully");
+       
       }
 
 

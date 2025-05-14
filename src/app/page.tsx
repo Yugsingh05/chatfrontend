@@ -3,18 +3,41 @@ import Chat from "@/components/Chat/Chat";
 import ChatList from "@/components/ChatList";
 import Empty from "@/components/Empty";
 import { useChatReducer } from "@/context/ChatContext";
+import { useSocketReducer } from "@/context/SocketContext";
 import { useStateProvider } from "@/context/StateContext";
-import { CHECK_USER_ROUTE } from "@/utils/ApiRoutes";
-import { firebaseAuth } from "@/utils/firebaseconfig";
-import axios from "axios";
-import { onAuthStateChanged } from "firebase/auth";
+import { HOST } from "@/utils/ApiRoutes";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
 
 export default function Home() {
   const { data, setData } = useStateProvider();
   const router = useRouter();
-  const {currentChatUser,setCurrentChatUser} = useChatReducer();
+  const {currentChatUser,setChatMessages} = useChatReducer();
+  const [socketEvent,setSocketEvent] = useState(false);
+
+  const {ContextSocket,setContextSocket} = useSocketReducer();
+
+  const socket = useRef();
+
+  useEffect(() => {
+
+    if(data){
+      socket.current = io(HOST);
+      socket.current.emit("add-user",data.id);
+      setContextSocket(socket.current);
+    }
+
+  },[data])
+
+  useEffect(() => {
+    if(socket.current && !socketEvent){
+      socket.current.on("msg-receive", (data) => {
+        console.log(data)
+        setChatMessages((prev) => [...prev, data.message]);
+      })
+    }
+  },[socket.current])
 
   
 
