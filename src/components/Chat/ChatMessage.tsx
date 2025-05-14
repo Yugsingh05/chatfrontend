@@ -2,33 +2,43 @@ import { calculateTime } from "@/utils/CalculateTime";
 import { MessageType } from "./ChatContainer";
 import MessageStatus from "./MessageStatus";
 
-const ChatMessage = ({ message, isOutgoing , userId}: { message: MessageType; isOutgoing: boolean ,userId : string}) => {
+const ChatMessage = ({
+  message,
+  isOutgoing,
+  userId,
+}: {
+  message: MessageType;
+  isOutgoing: boolean;
+  userId: string;
+}) => {
   if (message.type === "text") {
     return (
-      <div
-        className={`flex ${isOutgoing ? "justify-end" : "justify-start"} mb-2`}
-      >
+      <div className={`flex ${isOutgoing ? "justify-end" : "justify-start"} px-4 py-1`}>
         <div
-          className={`px-3 py-2 rounded-lg text-sm flex gap-2 items-end max-w-xs md:max-w-md lg:max-w-lg 
-          ${isOutgoing 
-            ? "bg-outgoing-background text-white rounded-tr-none" 
-            : "bg-incoming-background text-white rounded-tl-none"
-          }`}
+          className={`relative px-4 py-2 rounded-xl text-sm w-fit max-w-[80%] flex flex-col gap-1 transition
+            ${isOutgoing
+              ? "bg-outgoing-background text-white rounded-tr-md rounded-br-none"
+              : "bg-incoming-background text-white rounded-tl-md rounded-bl-none"
+            } shadow-sm`}
         >
-          <span className="break-words whitespace-pre-wrap">{message.message}</span>
-          <span className="text-bubble-meta text-xs self-end ml-1 min-w-fit whitespace-nowrap">
-            {calculateTime(message.createdAt)}
+          {/* Message text */}
+          <span className="whitespace-pre-wrap break-words leading-relaxed">
+            {message.message}
           </span>
-          <span>
-            {message.senderId !== message.receiverId &&  <MessageStatus status={message.messageStatus}/>}
-          </span>
+
+          {/* Timestamp + Status */}
+          <div className="flex items-center justify-end gap-1 text-xs text-bubble-meta mt-1">
+            <span className="whitespace-nowrap">{calculateTime(message.createdAt)}</span>
+            {message.senderId !== message.receiverId && (
+              <MessageStatus status={message.messageStatus} />
+            )}
+          </div>
         </div>
       </div>
     );
   }
-  
-  // Handle other message types here (images, files, etc.)
+
   return null;
 };
 
-export default ChatMessage
+export default ChatMessage;
