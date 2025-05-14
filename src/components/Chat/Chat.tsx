@@ -9,29 +9,29 @@ import { useStateProvider } from "@/context/StateContext";
 
 const Chat = () => {
 
-   const {currentChatUser} = useChatReducer();
+   const {currentChatUser , setChatMessages} = useChatReducer();
    const { data } = useStateProvider();
 
    useEffect(() => {
-
     async function getData() {
-
       try {
 
         const res = await axios.get(GET_MESSAGES_ROUTE.replace(":senderId", currentChatUser?.id || "").replace(":receiverId", data?.id || ""));
 
-        console.log(res.data);
-        
+        setChatMessages(res.data.msg);
+
+        console.log(res.data.msg); 
       } catch (error) {
         console.log(error)
       }
-      
     }
     if(currentChatUser) getData()
    }
    
 
     ,[currentChatUser])
+
+    
   return (
     <div className="border-conversation-border border-1 w-full bg-conversation-panel-background flex flex-col h-[100vh] border-b-4 border-b-icon-green ">
         <ChatHeader/>
