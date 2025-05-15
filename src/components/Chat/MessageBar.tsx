@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BsEmojiSmile } from "react-icons/bs";
 import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
@@ -8,13 +8,40 @@ import { ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import { useChatReducer } from "@/context/ChatContext";
 import { useStateProvider } from "@/context/StateContext";
 import { useSocketReducer } from "@/context/SocketContext";
+import EmojiPicker from "emoji-picker-react";
 
 const MessageBar = () => {
   const [message, SetMessage] = useState("");
   const { currentChatUser,setChatMessages } = useChatReducer();
   const { data } = useStateProvider();
+  const [shwoEmojiPicker,setShowEmojiPicker] = useState(false);
 
   const {ContextSocket} = useSocketReducer();
+
+  const emojiRef = useRef(null);
+
+
+  useEffect(()  => {
+    const handleClickOutside = (event) => {
+      if(event.target.id !== "emoji-opener"){
+        if(emojiRef.current && !emojiRef.current.contains(event.target)){
+          setShowEmojiPicker(false);
+        }
+      }
+    }
+    document.addEventListener("click",handleClickOutside);
+    return () => {
+      document.removeEventListener("click",handleClickOutside);
+    }
+  },[])
+
+  const handleEmojiModal = () => {
+    setShowEmojiPicker((prev) => !prev)
+  }
+
+  const handleEmojiClick= (emoji) => {
+    SetMessage((prev) => prev + emoji.emoji)
+  }
 
   const handleSend = async () => {
     if (!message) return;
@@ -56,7 +83,12 @@ const MessageBar = () => {
           <BsEmojiSmile
             className="text-panel-header-icon text-xl cursor-pointer"
             title="Emoji"
+            onClick={handleEmojiModal}
+            id="emoji-opener"
           />
+          {shwoEmojiPicker && (<div  ref={emojiRef} className="absolute bottom-24 left-16 z-40">
+            <EmojiPicker theme="dark" onEmojiClick={handleEmojiClick} />
+          </div>)}
           <ImAttachment
             className="text-panel-header-icon text-xl cursor-pointer"
             title="Attachment"
