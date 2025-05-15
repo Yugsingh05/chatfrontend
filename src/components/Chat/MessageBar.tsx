@@ -11,7 +11,7 @@ import { useSocketReducer } from "@/context/SocketContext";
 
 const MessageBar = () => {
   const [message, SetMessage] = useState("");
-  const { currentChatUser } = useChatReducer();
+  const { currentChatUser,setChatMessages } = useChatReducer();
   const { data } = useStateProvider();
 
   const {ContextSocket} = useSocketReducer();
@@ -32,6 +32,7 @@ const MessageBar = () => {
       console.log(res.data);
 
       if (res.data.status) { 
+        setChatMessages((prev) => [...prev, res.data.msg]);
         
         ContextSocket.emit("send-msg",{
           to : currentChatUser.id,
