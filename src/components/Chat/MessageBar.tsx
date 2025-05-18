@@ -2,15 +2,16 @@ import React, { useEffect, useRef, useState } from "react";
 import { BsEmojiSmile, BsMic } from "react-icons/bs";
 import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
-import { FaMicrophone } from "react-icons/fa";
 import axios from "axios";
 import { ADD_IMAGE_MESSAGE_ROUTE, ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import { useChatReducer } from "@/context/ChatContext";
-import { user, useStateProvider } from "@/context/StateContext";
+import {  useStateProvider } from "@/context/StateContext";
 import { useSocketReducer } from "@/context/SocketContext";
 import EmojiPicker from "emoji-picker-react";
 import PhotoPicker from "../PhotoPicker";
-import CaptureAudio from "./CaptureAudio";
+import dynamic from "next/dynamic";
+
+const CaptureAudio = dynamic(() => import("./CaptureAudio"), { ssr: false });
 
 const MessageBar = () => {
   const [message, SetMessage] = useState("");
