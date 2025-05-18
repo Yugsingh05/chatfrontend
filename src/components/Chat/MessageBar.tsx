@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { BsEmojiSmile } from "react-icons/bs";
+import { BsEmojiSmile, BsMic } from "react-icons/bs";
 import { ImAttachment } from "react-icons/im";
 import { MdSend } from "react-icons/md";
 import { FaMicrophone } from "react-icons/fa";
@@ -10,6 +10,7 @@ import { user, useStateProvider } from "@/context/StateContext";
 import { useSocketReducer } from "@/context/SocketContext";
 import EmojiPicker from "emoji-picker-react";
 import PhotoPicker from "../PhotoPicker";
+import CaptureAudio from "./CaptureAudio";
 
 const MessageBar = () => {
   const [message, SetMessage] = useState("");
@@ -19,6 +20,7 @@ const MessageBar = () => {
   const [grabPhoto, setGrabPhoto] = useState(false);
   const [image, setImage] = useState("");
   const { ContextSocket } = useSocketReducer();
+  const [showAudioRecorder, setShowAudioRecorder] = useState(false);
 
   const emojiRef = useRef(null);
   const fileInputRef = useRef(null); // ✅ Ref for the file input
@@ -74,23 +76,22 @@ const MessageBar = () => {
     }
   };
 
-  const handlePhotoChange =async (e: { target: { files: unknown[]; }; }) => {
-   
+  const handlePhotoChange = async (e: { target: { files: unknown[] } }) => {
     try {
       const file = e.target.files[0];
-  
+
       const formdata = new FormData();
       formdata.append("image", file);
       formdata.append("recieverId", currentChatUser?.id || "");
       formdata.append("senderId", data?.id || "");
-  
+
       const res = await axios.post(ADD_IMAGE_MESSAGE_ROUTE, formdata, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      })
+      });
 
-      if(res.data.status){
+      if (res.data.status) {
         setChatMessages((prev: any) => [...prev, res.data.msg]);
         ContextSocket.emit("send-msg", {
           to: currentChatUser.id,
@@ -102,12 +103,16 @@ const MessageBar = () => {
       console.log(res.data);
     } catch (error) {
       console.log(error);
-      
     }
+  };
+
+  const handleRecorderChange = () => {
+    setShowAudioRecorder(true);
   };
 
   return (
     <div className="bg-panel-header-background h-20 px-4 flex items-center gap-6 relative">
+      {!showAudioRecorder &&(<>
       <div className="flex gap-6">
         <BsEmojiSmile
           className="text-panel-header-icon text-xl cursor-pointer"
@@ -150,18 +155,30 @@ const MessageBar = () => {
 
       <div className="flex w-10 items-center justify-center">
         <button>
-          <MdSend
-            className="text-panel-header-icon text-xl cursor-pointer"
-            title="Send"
-            onClick={handleSend}
-          />
+          {message.length ? (
+            <MdSend
+              className="text-panel-header-icon text-xl cursor-pointer"
+              title="Send"
+              onClick={handleSend}
+            />
+          ) : (
+            <BsMic
+              className="text-panel-header-icon text-xl cursor-pointer"
+              title="Record"
+              onClick={handleRecorderChange}
+            />
+          )}
         </button>
       </div>
+      </>
+  )}
 
       {grabPhoto && <PhotoPicker onChange={handlePhotoChange} />}
+      {showAudioRecorder && (
+        <CaptureAudio hide={() => setShowAudioRecorder(false)} />
+      )}
     </div>
   );
 };
 
 export default MessageBar;
-
