@@ -14,3 +14,5 @@ export const ADD_MESSAGE_ROUTE = `${MESSAGE_ROUTES}/add-message`
 export const GET_MESSAGES_ROUTE = `${MESSAGE_ROUTES}/get-messages/:senderId/:receiverId`
 
 export const ADD_IMAGE_MESSAGE_ROUTE = `${MESSAGE_ROUTES}/add-image-message`
+
+export const ADD_AUDIO_MESSAGE_ROUTE = `${MESSAGE_ROUTES}/add-audio-message`
