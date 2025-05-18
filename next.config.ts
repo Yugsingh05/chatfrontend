@@ -5,7 +5,8 @@ const nextConfig: NextConfig = {
   images : {
     domains: [
       "lh3.googleusercontent.com",
-      "cdn.pixabay.com"
+      "cdn.pixabay.com",
+      "localhost"
     ]
   }
 
