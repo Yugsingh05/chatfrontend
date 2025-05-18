@@ -71,7 +71,7 @@ export const StateProvider = ({children} : {children : React.ReactNode})  => {
     )
 }
 
-export const useStateProvider = () => {
+export const useStateProvider = () : {data : user, setData : React.Dispatch<React.SetStateAction<user>>} => {
 
     const context =  useContext(StateContext);
     if(!context){
