@@ -7,11 +7,12 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaMicrophone, FaPause, FaPlay, FaStop, FaTrash } from "react-icons/fa";
 import { MdSend } from "react-icons/md";
 import WaveSurfer from "wavesurfer.js";
+import { MessageType } from "./ChatContainer";
 
-const CaptureAudio = ({ hide }) => {
+const CaptureAudio = ({ hide } : { hide: () => void }) => {
   const { data } = useStateProvider();
-  const { currentChatUser, setChatMessages } = useChatReducer();
-  const { SocketEvent, ContextSocket } = useSocketReducer();
+  const { currentChatUser, setChatMessages  }  = useChatReducer();
+  const {  ContextSocket } = useSocketReducer();
 
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -124,7 +125,7 @@ const CaptureAudio = ({ hide }) => {
         setRecordingDuration(0);
         
         hide();
-        setChatMessages((prev: any) => [...prev, res.data.msg]);
+        setChatMessages((prev: MessageType) => [...prev, res.data.msg]);
         ContextSocket.emit("send-msg", {
           to: currentChatUser.id,
           from: data.id,

@@ -8,7 +8,7 @@ import { useChatReducer } from "@/context/ChatContext";
 import { user } from "@/context/StateContext";
 
 const ChatHeader = () => {
-  const {currentChatUser,setCurrentChatUser} = useChatReducer();
+  const {currentChatUser,setSearchMessages} = useChatReducer();
   const[dataOfUser,setDataOfUser] = useState<user | null>(null);
   
   useEffect(() => {console.log(currentChatUser);
@@ -32,7 +32,7 @@ const ChatHeader = () => {
       <div className="flex gap-6">
         <MdCall className="text-panel-header-icon text-xl cursor-pointer" title="Call" />
         <IoVideocam className="text-panel-header-icon text-xl cursor-pointer" title="Video Call"/>
-        <BiSearchAlt2 className="text-panel-header-icon text-xl cursor-pointer" title="Search" />
+        <BiSearchAlt2 className="text-panel-header-icon text-xl cursor-pointer" title="Search" onClick={() => setSearchMessages((prev) => !prev)} />
         <BsThreeDotsVertical className="text-panel-header-icon text-xl cursor-pointer" title="Menu" />
 
       </div>

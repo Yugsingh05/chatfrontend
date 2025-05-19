@@ -6,6 +6,7 @@ import React, { useRef, useEffect } from "react";
 import ChatMessage from "./ChatMessage";
 
 export type MessageType = {
+  filter: any;
   id: string;
   message: string;
   senderId: string;

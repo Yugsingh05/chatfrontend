@@ -8,6 +8,7 @@ const ChatContext = createContext({});
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentChatUser, setCurrentChatUser] = useState(null);
   const [ChatMessages, setChatMessages] = useState([]);
+  const [searchMessages,setSearchMessages] = useState(false);
 
   return (
     <ChatContext.Provider
@@ -16,6 +17,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         setCurrentChatUser,
         ChatMessages,
         setChatMessages,
+        searchMessages,
+        setSearchMessages
       }}
     >
       {children}
@@ -23,7 +26,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const useChatReducer = () : {currentChatUser : user, setCurrentChatUser : React.Dispatch<React.SetStateAction<user>>, ChatMessages : MessageType, setChatMessages : React.Dispatch<React.SetStateAction<MessageType>>} => {
+const useChatReducer = () : {currentChatUser : user, setCurrentChatUser : React.Dispatch<React.SetStateAction<user>>, ChatMessages : MessageType, setChatMessages : React.Dispatch<React.SetStateAction<MessageType>>, searchMessages : boolean, setSearchMessages : React.Dispatch<React.SetStateAction<boolean>>} => {
   const context = useContext(ChatContext);
   if (!context) {
     throw new Error("useChatReducer must be used within a ChatContextProvider");

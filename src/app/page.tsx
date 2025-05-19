@@ -1,5 +1,6 @@
 "use client";
 import Chat from "@/components/Chat/Chat";
+import MessageSearch from "@/components/Chat/MessageSearch";
 import ChatList from "@/components/ChatList";
 import Empty from "@/components/Empty";
 import { useChatReducer } from "@/context/ChatContext";
@@ -13,7 +14,7 @@ import { io } from "socket.io-client";
 export default function Home() {
   const { data, setData } = useStateProvider();
   const router = useRouter();
-  const {currentChatUser,setChatMessages} = useChatReducer();
+  const {currentChatUser,setChatMessages,searchMessages} = useChatReducer();
   const [socketEvent,setSocketEvent] = useState(false);
 
   const {ContextSocket,setContextSocket} = useSocketReducer();
@@ -45,7 +46,12 @@ export default function Home() {
     <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen overflow-hidden">
       <ChatList />
       {/* <Empty /> */}
-      {currentChatUser ? <Chat /> : <Empty />}
+      {currentChatUser ? 
+      <div className={searchMessages ? "grid grid-cols-2" : "grid-cols-2"}>
+        <Chat />
+        {searchMessages && <MessageSearch/>}
+
+      </div> : <Empty />}
     </div>
   );
 }
