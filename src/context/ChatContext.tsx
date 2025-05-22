@@ -8,7 +8,9 @@ const ChatContext = createContext({});
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentChatUser, setCurrentChatUser] = useState(null);
   const [ChatMessages, setChatMessages] = useState([]);
-  const [searchMessages,setSearchMessages] = useState(false);
+  const [searchMessages, setSearchMessages] = useState(false);
+  const [userContacts, setUserContacts] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
 
   return (
     <ChatContext.Provider
@@ -18,7 +20,11 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         ChatMessages,
         setChatMessages,
         searchMessages,
-        setSearchMessages
+        setSearchMessages,
+        userContacts,
+        setUserContacts,
+        onlineUsers,
+        setOnlineUsers,
       }}
     >
       {children}
@@ -26,7 +32,18 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const useChatReducer = () : {currentChatUser : user, setCurrentChatUser : React.Dispatch<React.SetStateAction<user>>, ChatMessages : MessageType, setChatMessages : React.Dispatch<React.SetStateAction<MessageType>>, searchMessages : boolean, setSearchMessages : React.Dispatch<React.SetStateAction<boolean>>} => {
+const useChatReducer = (): {
+  currentChatUser: user;
+  setCurrentChatUser: React.Dispatch<React.SetStateAction<user>>;
+  ChatMessages: MessageType;
+  setChatMessages: React.Dispatch<React.SetStateAction<MessageType>>;
+  searchMessages: boolean;
+  setSearchMessages: React.Dispatch<React.SetStateAction<boolean>>;
+  userContacts: user[];
+  setUserContacts: React.Dispatch<React.SetStateAction<user[]>>;
+  onlineUsers: string[];
+  setOnlineUsers: React.Dispatch<React.SetStateAction<string[]>>;
+} => {
   const context = useContext(ChatContext);
   if (!context) {
     throw new Error("useChatReducer must be used within a ChatContextProvider");

@@ -16,3 +16,5 @@ export const GET_MESSAGES_ROUTE = `${MESSAGE_ROUTES}/get-messages/:senderId/:rec
 export const ADD_IMAGE_MESSAGE_ROUTE = `${MESSAGE_ROUTES}/add-image-message`
 
 export const ADD_AUDIO_MESSAGE_ROUTE = `${MESSAGE_ROUTES}/add-audio-message`
+
+export const GET_INITIAL_CONTACT_WITH_MESSAGES_ROUTE = `${MESSAGE_ROUTES}/get-initial-contacts/:userId`
