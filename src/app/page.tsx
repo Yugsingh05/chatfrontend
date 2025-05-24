@@ -10,6 +10,7 @@ import { HOST } from "@/utils/ApiRoutes";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
+ import type { Socket } from "socket.io-client";
 
 export default function Home() {
   const { data, setData } = useStateProvider();
@@ -19,7 +20,8 @@ export default function Home() {
 
   const {ContextSocket,setContextSocket} = useSocketReducer();
 
-  const socket = useRef();
+ 
+  const socket = useRef<Socket | null>(null);
 
   useEffect(() => {
 
@@ -44,7 +46,7 @@ export default function Home() {
 
   return (
     <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen overflow-hidden">
-      <ChatList />
+      <ChatList contact={currentChatUser} />
       {/* <Empty /> */}
       {currentChatUser ? 
       <div className={searchMessages ? "grid grid-cols-2" : "grid-cols-2"}>

@@ -11,6 +11,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [searchMessages, setSearchMessages] = useState(false);
   const [userContacts, setUserContacts] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
+  const [searchedUsers, setSearchedUsers] = useState<string>("");
 
   return (
     <ChatContext.Provider
@@ -25,6 +26,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         setUserContacts,
         onlineUsers,
         setOnlineUsers,
+        searchedUsers,
+        setSearchedUsers
       }}
     >
       {children}
@@ -43,6 +46,8 @@ const useChatReducer = (): {
   setUserContacts: React.Dispatch<React.SetStateAction<user[]>>;
   onlineUsers: string[];
   setOnlineUsers: React.Dispatch<React.SetStateAction<string[]>>;
+  searchedUsers: string;
+  setSearchedUsers: React.Dispatch<React.SetStateAction<string>>;
 } => {
   const context = useContext(ChatContext);
   if (!context) {
