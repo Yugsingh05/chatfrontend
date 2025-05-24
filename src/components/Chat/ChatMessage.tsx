@@ -59,7 +59,7 @@ const ChatMessage = ({
           {/* Timestamp + Status */}
           <div className="flex items-center justify-end gap-1 text-xs text-bubble-meta mt-1">
             <span className="whitespace-nowrap">{calculateTime(message.createdAt)}</span>
-            {message.senderId !== message.receiverId && (
+            {message.senderId === userId && (
               <MessageStatus status={message.messageStatus} />
             )}
           </div>

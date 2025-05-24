@@ -5,7 +5,7 @@ import { calculateTime } from "@/utils/CalculateTime";
 import axios from "axios";
 import { LoaderCircle } from "lucide-react";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import MessageStatus from "./Chat/MessageStatus";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
 
@@ -69,6 +69,8 @@ export const List = () => {
   const handleClick = ({ user }: { user: ContactUserType }) => {
     console.log(user);
     setCurrentChatUser(user);
+    user.totalUnreadMessages = 0;
+   
   };
 
   if (loading)
@@ -86,11 +88,11 @@ export const List = () => {
       className="bg-search-input-container-background flex-auto 
      overflow-auto max-h-full custom-scrollbar"
     >
-      {(userContacts as ContactUserType[])?.map((contact: ContactUserType) => (
+      {(userContacts as unknown as ContactUserType[])?.map((contact: ContactUserType) => (
         <div
           key={contact.id}
           className="px-10 py-2 flex items-center gap-5 hover:bg-panel-header-background cursor-pointer"
-          onClick={() => handleClick({ user: contact })}
+          onClick={() => handleClick({ user: contact  })}
         >
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-panel-header-icon">
@@ -120,15 +122,25 @@ export const List = () => {
                 <MessageStatus status={contact.messageStatus} />
               )}
               {contact.type === "text" && (
-                <span className="truncate text-secondary">{contact.message}</span>
+                <span className="truncate text-secondary">
+                  {contact.message}
+                </span>
               )}
               {contact.type === "audio" && (
-                <span className="flex gap-1 items-center text-secondary"><FaMicrophone className="text-icon-green" /> Audio</span>
+                <span className="flex gap-1 items-center text-secondary">
+                  <FaMicrophone className="text-icon-green" /> Audio
+                </span>
               )}
               {contact.type === "image" && (
-                <span className="flex gap-1 items-center text-secondary"><FaCamera className="text-icon-green" /> Image</span>
+                <span className="flex gap-1 items-center text-secondary">
+                  <FaCamera className="text-icon-green" /> Image
+                </span>
               )}
-              {contact.totalUnreadMessages > 0 && <span className="bg-green-400 px-[5px] w-5 rounded-full text-sm ">{contact.totalUnreadMessages}</span>}
+              {contact.totalUnreadMessages > 0 && (
+                <span className="bg-green-400 px-[5px] w-5 rounded-full text-sm ">
+                  {contact.totalUnreadMessages}
+                </span>
+              )}
             </div>
           </div>
         </div>

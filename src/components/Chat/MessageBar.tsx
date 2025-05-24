@@ -10,6 +10,7 @@ import { useSocketReducer } from "@/context/SocketContext";
 import EmojiPicker from "emoji-picker-react";
 import PhotoPicker from "../PhotoPicker";
 import dynamic from "next/dynamic";
+import { MessageType } from "./ChatContainer";
 
 const CaptureAudio = dynamic(() => import("./CaptureAudio"), { ssr: false });
 
@@ -62,7 +63,7 @@ const MessageBar = () => {
       });
 
       if (res.data.status) {
-        setChatMessages((prev: any) => [...prev, res.data.msg]);
+        setChatMessages((prev: MessageType) =>[...prev, res.data.msg]);
 
         ContextSocket.emit("send-msg", {
           to: currentChatUser.id,
