@@ -12,6 +12,18 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [userContacts, setUserContacts] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [searchedUsers, setSearchedUsers] = useState<string>("");
+  const [videoCall, setVideoCall] = useState(undefined);
+  const [audioCall, setAudioCall] = useState(undefined);
+
+  const [Incoming_Voice_Call, setIncomingVoiceCall] = useState(undefined);
+  const [Incoming_Video_Call, setIncomingVideoCall] = useState(undefined);
+
+  const EndCall = () => {
+    setVideoCall(undefined);
+    setAudioCall(undefined);
+    setIncomingVoiceCall(undefined);
+    setIncomingVideoCall(undefined);
+  };
 
   return (
     <ChatContext.Provider
@@ -27,7 +39,16 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         onlineUsers,
         setOnlineUsers,
         searchedUsers,
-        setSearchedUsers
+        setSearchedUsers,
+        videoCall,
+        setVideoCall,
+        audioCall,
+        setAudioCall,
+        EndCall,
+        Incoming_Voice_Call,
+        setIncomingVoiceCall,
+        Incoming_Video_Call,
+        setIncomingVideoCall,
       }}
     >
       {children}
@@ -48,6 +69,15 @@ const useChatReducer = (): {
   setOnlineUsers: React.Dispatch<React.SetStateAction<string[]>>;
   searchedUsers: string;
   setSearchedUsers: React.Dispatch<React.SetStateAction<string>>;
+  videoCall: unknown;
+  setVideoCall: React.Dispatch<React.SetStateAction<unknown>>;
+  audioCall: unknown;
+  setAudioCall: React.Dispatch<React.SetStateAction<unknown>>;
+  EndCall: () => void;
+  Incoming_Voice_Call: unknown;
+  setIncomingVoiceCall: React.Dispatch<React.SetStateAction<unknown>>;
+  Incoming_Video_Call: unknown;
+  setIncomingVideoCall: React.Dispatch<React.SetStateAction<unknown>>;
 } => {
   const context = useContext(ChatContext);
   if (!context) {
