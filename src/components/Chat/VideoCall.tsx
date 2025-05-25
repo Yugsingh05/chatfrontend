@@ -6,7 +6,7 @@ import { useStateProvider } from '@/context/StateContext'
 const Container = dynamic(() => import('./Container'), { ssr: false })
 
 const VideoCall = () => {
-    const {videoCall,EndCall} = useChatReducer();
+    const {videoCall} = useChatReducer();
     const {ContextSocket} = useSocketReducer()
     const {data} = useStateProvider();
 
