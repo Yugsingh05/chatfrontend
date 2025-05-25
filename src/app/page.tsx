@@ -1,4 +1,6 @@
 "use client";
+import IncomingVideoCall from "@/components/Call/IncomingVideoCall";
+import IncomingVoiceCall from "@/components/Call/IncomingVoiceCall";
 import AudioCall from "@/components/Chat/AudioCall";
 import Chat from "@/components/Chat/Chat";
 import MessageSearch from "@/components/Chat/MessageSearch";
@@ -23,10 +25,13 @@ export default function Home() {
     audioCall,
     Incoming_Video_Call,
     Incoming_Voice_Call,
+    setIncomingVideoCall,
+    setIncomingVoiceCall,
+    EndCall,
   } = useChatReducer();
   const [socketEvent, setSocketEvent] = useState(false);
 
-  const { ContextSocket, setContextSocket } = useSocketReducer();
+  const { setContextSocket } = useSocketReducer();
 
   const socket = useRef<Socket | null>(null);
 
@@ -45,19 +50,49 @@ export default function Home() {
         console.log(data);
         setChatMessages((prev) => [...prev, data.message]);
       });
+
+      socket.current.on("incoming-voice-call", ({ from, roomId, callType }) => {
+        setIncomingVoiceCall({
+          ...from,
+          roomId,
+          callType,
+        });
+      });
+
+      socket.current.on("incoming-video-call", ({ from, roomId, callType }) => {
+        setIncomingVideoCall({
+          ...from,
+          roomId,
+          callType,
+        });
+      });
+
+      socket.current.on("voice-call-rejected", () => {
+        EndCall();
+      });
+
+      socket.current.on("video-call-rejected", () => {
+        console.log("video call rejected");
+        EndCall();
+      });
+
+      setSocketEvent(true);
     }
   }, [socket.current]);
 
   return (
     <>
+      {Incoming_Video_Call && <IncomingVideoCall />}
+      {Incoming_Voice_Call && <IncomingVoiceCall />}
+
       {videoCall && (
         <div className="h-screen w-screen max-h-full overflow-hidden">
-         <VideoCall/>
+          <VideoCall />
         </div>
       )}
       {audioCall && (
         <div className="h-screen w-screen max-h-full overflow-hidden">
-         <AudioCall/>
+          <AudioCall />
         </div>
       )}
       {!videoCall && !audioCall && (

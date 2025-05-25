@@ -17,13 +17,14 @@ const AudioCall = () => {
         if (audioCall.type === "out-going") {
           ContextSocket.emit("outgoing-voice-call", {
             to : audioCall.id,
-            from : data.id,
-            name : audioCall.name
-          },
-        callType : audioCall.callType,
-        roomId : audioCall.roomId)
+            from : data,
+            name : audioCall.name,
+            callType : audioCall.callType,
+            roomId : audioCall.roomId,
+          });
         }
-    },[audioCall])
+          },
+       [audioCall])
 
   return (
    <Container CallData={audioCall}/>

@@ -9,11 +9,22 @@ import { MdOutlineCallEnd } from "react-icons/md";
 const Container = ({ CallData }) => {
   const { ContextSocket } = useSocketReducer();
 
+  const {EndCall} = useChatReducer()
   const { data } = useStateProvider();
-  const {EndCall} = useChatReducer();
+
   const [callAccepted, setCallAccepted] = useState(false);
 
-  console.log(CallData);
+  const endCall = () => {
+    const id = CallData.id;
+    
+    if(CallData.callType === "voice"){
+      ContextSocket.emit("reject-voice-call", {from : id});
+    }else{
+      ContextSocket.emit("reject-video-call", {from : id});
+    }
+    EndCall();
+
+  }
 
   
 
@@ -40,7 +51,7 @@ const Container = ({ CallData }) => {
           </div>
         )}
 
-        <button className="h-16 w-16 bg-red-600 mx-auto flex items-center justify-center rounded-full cursor-pointer" onClick={() => EndCall() }>
+        <button className="h-16 w-16 bg-red-600 mx-auto flex items-center justify-center rounded-full cursor-pointer" onClick={() => endCall() }>
             <MdOutlineCallEnd className="text-3xl cursor-pointer " />
         </button>
     </div>

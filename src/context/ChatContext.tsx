@@ -23,6 +23,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
     setAudioCall(undefined);
     setIncomingVoiceCall(undefined);
     setIncomingVideoCall(undefined);
+    
   };
 
   return (
