@@ -64,14 +64,34 @@ export const StateProvider = ({children} : {children : React.ReactNode})  => {
 
     return () => unsubscribe(); // Clean up listener on unmount
   }, [router, setData]);
-    return (
-        <StateContext.Provider value={{ data, setData }}>
-            {children}
-        </StateContext.Provider>
-    )
-}
 
-export const useStateProvider = () : {data : user, setData : React.Dispatch<React.SetStateAction<user>>} => {
+
+  const handleLogout = async () => {
+    try {
+      await firebaseAuth.signOut();
+      setData({
+        id: "",
+        name: "",
+        email: "",
+        profileImage: "",
+        about: "",
+        status: false,
+        isNewUser: true,
+      });
+      router.push("/login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
+
+  return (
+    <StateContext.Provider value={{ data, setData ,handleLogout}}>
+      {children}
+    </StateContext.Provider>
+  );
+};
+
+export const useStateProvider = (): { data: user; setData: React.Dispatch<React.SetStateAction<user>>, handleLogout : () => void } => {
 
     const context =  useContext(StateContext);
     if(!context){

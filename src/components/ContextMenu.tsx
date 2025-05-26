@@ -7,49 +7,57 @@ interface ContextMenuProps {
   setContextMenu: (value: boolean) => void;
 }
 
-const ContextMenu: React.FC<ContextMenuProps> = ({ options, cordinates, setContextMenu }) => {
-  const contextMenuRef = useRef(null);
+const ContextMenu: React.FC<ContextMenuProps> = ({
+  options,
+  cordinates,
+  setContextMenu,
+}) => {
+  const contextMenuRef = useRef<HTMLDivElement | null>(null);
 
-  const handleClick = (e: React.MouseEvent<HTMLLIElement, MouseEvent>, callback: { (): void; (): void; }) => {
+  const handleClick = (
+    e: React.MouseEvent<HTMLLIElement, MouseEvent>,
+    callback: () => void
+  ) => {
     e.stopPropagation();
     callback();
     setContextMenu(false);
   };
 
   useEffect(() => {
-    const handleOutSideClick = (event: { target: { id: string; }; }) => {
-      if(event.target.id !== "context-opener"){
-        if(
-          contextMenuRef.current &&
-          !contextMenuRef.current.contains(event.target)
-        ){
-          setContextMenu(false);
-        }
+    const handleOutsideClick = (event: MouseEvent) => {
+      if (
+        contextMenuRef.current &&
+        !contextMenuRef.current.contains(event.target as Node)
+      ) {
+        setContextMenu(false);
       }
-      
-    }
+    };
 
-    document.addEventListener("click", handleOutSideClick);
+    document.addEventListener("click", handleOutsideClick);
     return () => {
-      document.removeEventListener("click", handleOutSideClick);
-    }
-  },[])
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [setContextMenu]);
+
+  
 
   return (
     <div
-      className={`bg-dropdown-background fixed py-2 
-         z-[100] shadow-xl`}
       ref={contextMenuRef}
+      className="fixed z-50 bg-neutral-800 rounded-md shadow-lg w-auto"
       style={{
         top: cordinates.y,
         left: cordinates.x,
       }}
     >
-      <ul>
+      <ul className="py-2">
         {options.map(({ name, callback }) => (
-          <li key={name} onClick={(e) => handleClick(e, callback)}
-          className="px-5 py-2 cursor-pointer hover:bg-background-default-hover">
-            <span className="text-white">{name}</span>
+          <li
+            key={name}
+            onClick={(e) => handleClick(e, callback)}
+            className="px-5 py-1 text-md font-mono text-white hover:bg-neutral-700 cursor-pointer transition-colors w-full"
+          >
+            {name}
           </li>
         ))}
       </ul>

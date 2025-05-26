@@ -6,11 +6,17 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import { MdCall } from "react-icons/md";
 import { useChatReducer } from "@/context/ChatContext";
 import { user } from "@/context/StateContext";
+import ContextMenu from "../ContextMenu";
 
 const ChatHeader = () => {
-  const { currentChatUser, setSearchMessages, setVideoCall, setAudioCall } =
+  const { currentChatUser, setSearchMessages, setVideoCall, setAudioCall ,setCurrentChatUser,EndCall , onlineUsers} =
     useChatReducer();
   const [dataOfUser, setDataOfUser] = useState<user | null>(null);
+  const [contextmenuCoordinates, setContextmenuCoordinates] = useState<{
+    x: number;
+    y: number;
+  }>({ x: 0, y: 0 });
+  const [contextmenuVisible, setContextmenuVisible] = useState(false);
 
   useEffect(() => {
     console.log(currentChatUser);
@@ -34,6 +40,23 @@ const ChatHeader = () => {
     });
   };
 
+  const ContextMenuOptions = [
+    {
+      name: "Exit",
+      callback : () => {
+        setCurrentChatUser(undefined);
+        EndCall();
+        setContextmenuVisible(false);
+      }
+    }
+  ]
+
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+    setContextmenuCoordinates({ x: event.clientX - 70, y: event.clientY+20 });
+    setContextmenuVisible(true);
+  };
+
   return (
     <div className="h-16 px-4 py-3 flex justify-between items-center bg-panel-header-background z-10">
       <div className="flex items-center justify-center gap-6">
@@ -46,7 +69,8 @@ const ChatHeader = () => {
           <span className="text-primary-strong">
             {dataOfUser?.name || "User"}
           </span>
-          <span className="text-secondary text-sm">Online/offline</span>
+          <span className="text-secondary text-sm">{
+          onlineUsers.includes(currentChatUser.id) ? "Online" : "Offline" }</span>
         </div>
       </div>
       <div className="flex gap-6">
@@ -68,7 +92,14 @@ const ChatHeader = () => {
         <BsThreeDotsVertical
           className="text-panel-header-icon text-xl cursor-pointer"
           title="Menu"
+          onClick={handleContextMenu}
+         
         />
+        {
+          contextmenuVisible && (
+            <ContextMenu options={ContextMenuOptions} cordinates={contextmenuCoordinates} setContextMenu={setContextmenuVisible} contextMenu={contextmenuVisible}/>
+          )
+        }
       </div>
     </div>
   );

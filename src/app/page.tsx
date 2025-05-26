@@ -30,6 +30,7 @@ export default function Home() {
     EndCall,
   } = useChatReducer();
   const [socketEvent, setSocketEvent] = useState(false);
+  const {setOnlineUsers} = useChatReducer()
 
   const { setContextSocket } = useSocketReducer();
 
@@ -74,6 +75,11 @@ export default function Home() {
       socket.current.on("video-call-rejected", () => {
         console.log("video call rejected");
         EndCall();
+      });
+
+      socket.current.on("online-users", ({ onlineUsers }) => {
+       
+        setOnlineUsers(onlineUsers);
       });
 
       setSocketEvent(true);
