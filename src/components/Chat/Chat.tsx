@@ -40,27 +40,6 @@ const Chat = () => {
     if (currentChatUser) getData();
   }, [currentChatUser]);
 
-  
-  useEffect(() => {
-   
-     ContextSocket.on("mark-as-read", (success) => {
-      console.log("Message marked as read:", success);
-
-      if (success) {
-        setChatMessages((prev) =>
-          prev.map((message) => ({
-            ...message,
-            messageStatus: "read",
-          }))
-        );
-      }
-      
-    });
-
-
-  }, [ContextSocket,currentChatUser]);
-
-
 
   if (loading)
     return (

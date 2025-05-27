@@ -30,7 +30,7 @@ export default function Home() {
     EndCall,
   } = useChatReducer();
   const [socketEvent, setSocketEvent] = useState(false);
-  const {setOnlineUsers} = useChatReducer()
+  const { setOnlineUsers } = useChatReducer();
 
   const { setContextSocket } = useSocketReducer();
 
@@ -49,8 +49,20 @@ export default function Home() {
     if (socket.current && !socketEvent) {
       socket.current.on("msg-receive", (mess) => {
         console.log(mess);
-        socket.current?.emit("mark-as-read-by-receiver", { userId: currentChatUser?.id });
-         setChatMessages((prev) => [...prev, mess.message]);
+        setChatMessages((prev) => [...prev, mess.message]);
+        
+        if (socket.current?.connected && currentChatUser) {
+          socket.current.emit("mark-as-read-by-receiver", {
+            userId: currentChatUser?.id,
+          });
+        } else {
+          if (!currentChatUser) {
+            socket.current?.emit("mark-as-read-by-receiver", {
+              userId: mess.from,
+            });
+          }
+          console.warn("Socket not connected");
+        }
       });
 
       socket.current.on("incoming-voice-call", ({ from, roomId, callType }) => {
@@ -79,8 +91,20 @@ export default function Home() {
       });
 
       socket.current.on("online-users", ({ onlineUsers }) => {
-       
         setOnlineUsers(onlineUsers);
+      });
+
+      socket.current.on("mark-as-read", ({ userId, success }) => {
+        console.log("mark as read", userId, success);
+        if (success) {
+          setChatMessages((prev) =>
+            prev.map((msg) =>
+               msg.messageStatus !== "read"
+                ? { ...msg, messageStatus: "read" }
+                : msg
+            )
+          );
+        }
       });
 
       setSocketEvent(true);
