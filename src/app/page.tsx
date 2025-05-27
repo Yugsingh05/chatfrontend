@@ -47,9 +47,10 @@ export default function Home() {
 
   useEffect(() => {
     if (socket.current && !socketEvent) {
-      socket.current.on("msg-receive", (data) => {
-        console.log(data);
-        setChatMessages((prev) => [...prev, data.message]);
+      socket.current.on("msg-receive", (mess) => {
+        console.log(mess);
+        socket.current?.emit("mark-as-read-by-receiver", { userId: currentChatUser?.id });
+         setChatMessages((prev) => [...prev, mess.message]);
       });
 
       socket.current.on("incoming-voice-call", ({ from, roomId, callType }) => {

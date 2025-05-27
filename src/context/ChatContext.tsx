@@ -60,8 +60,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 const useChatReducer = (): {
   currentChatUser: user;
   setCurrentChatUser: React.Dispatch<React.SetStateAction<user>>;
-  ChatMessages: MessageType;
-  setChatMessages: React.Dispatch<React.SetStateAction<MessageType>>;
+  ChatMessages: MessageType[];
+  setChatMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
   searchMessages: boolean;
   setSearchMessages: React.Dispatch<React.SetStateAction<boolean>>;
   userContacts: user[];

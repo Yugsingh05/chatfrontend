@@ -2,6 +2,7 @@ import { calculateTime } from "@/utils/CalculateTime";
 import { MessageType } from "./ChatContainer";
 import MessageStatus from "./MessageStatus";
 import Image from "next/image";
+import { HOST } from "@/utils/ApiRoutes";
 
 const ChatMessage = ({
   message,
@@ -23,7 +24,7 @@ const ChatMessage = ({
             } shadow-sm`}
         >
           <Image
-            src={`http://localhost:3005/${message.message}`}
+            src={`${HOST}/${message.message}`}
             alt="image"
             width={200}
             height={200}
@@ -81,7 +82,7 @@ if (message.type === "audio") {
             } shadow-sm`}
         >
           <audio controls>
-            <source src={`http://localhost:3005/${message.message}`} type="audio/mpeg" />
+            <source src={`${HOST}/${message.message}`} type="audio/mpeg" />
             Your browser does not support the audio element.
           </audio>
 

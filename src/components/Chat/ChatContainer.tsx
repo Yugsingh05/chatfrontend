@@ -43,14 +43,13 @@ const ChatContainer: React.FC = () => {
 
   return (
     <div className="h-[80vh] w-full relative flex-grow overflow-auto custom-scrollbar">
-      {/* Background */}
+     
       <div className="bg-chat-background bg-fixed h-full w-full opacity-7 fixed left-0 top-0 z-0">
         <div className="mx-10 my-6 relative bottom-0 z-20 left-0"></div>
       </div>
-      
-      {/* Messages container */}
+
       <div className="flex flex-col relative z-0 h-full">
-        {/* Messages area with padding and proper height */}
+      
         <div className="flex-1 overflow-y-auto px-4 py-4">
           {!ChatMessages || ChatMessages.length === 0 ? (
             <div className="h-full flex items-center justify-center">
@@ -58,7 +57,7 @@ const ChatContainer: React.FC = () => {
             </div>
           ) : (
             <div className="flex flex-col">
-              {ChatMessages.map((message : MessageType) => (
+              {ChatMessages?.map((message : MessageType) => (
                 <ChatMessage
                   key={message.id}
                   message={message}

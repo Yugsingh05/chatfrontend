@@ -7,11 +7,14 @@ import axios from "axios";
 import { GET_MESSAGES_ROUTE } from "@/utils/ApiRoutes";
 import { useStateProvider } from "@/context/StateContext";
 import { LoaderCircle } from "lucide-react";
+import { useSocketReducer } from "@/context/SocketContext";
 
 const Chat = () => {
   const { currentChatUser, setChatMessages } = useChatReducer();
   const { data } = useStateProvider();
   const [loading, setLoading] = useState(false);
+
+  const {ContextSocket} = useSocketReducer()
 
   useEffect(() => {
     async function getData() {
@@ -27,7 +30,7 @@ const Chat = () => {
 
         setChatMessages(res.data.msg);
 
-        console.log(res.data.msg);
+      
       } catch (error) {
         console.log(error);
       } finally {
@@ -36,6 +39,28 @@ const Chat = () => {
     }
     if (currentChatUser) getData();
   }, [currentChatUser]);
+
+  
+  useEffect(() => {
+   
+     ContextSocket.on("mark-as-read", (success) => {
+      console.log("Message marked as read:", success);
+
+      if (success) {
+        setChatMessages((prev) =>
+          prev.map((message) => ({
+            ...message,
+            messageStatus: "read",
+          }))
+        );
+      }
+      
+    });
+
+
+  }, [ContextSocket,currentChatUser]);
+
+
 
   if (loading)
     return (

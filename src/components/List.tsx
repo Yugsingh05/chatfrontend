@@ -78,6 +78,11 @@ export const List = () => {
 
   const handleClick = (user: ContactUserType) => {
     setCurrentChatUser(user);
+    setUserContacts((prevContacts) =>
+      prevContacts.map((contact) =>
+        contact.id === user.id ? { ...contact, totalUnreadMessages: 0 } : contact
+      )
+    );
   };
 
   const contactList = searchedUsers ? searchedContacts : (userContacts as ContactUserType[]);

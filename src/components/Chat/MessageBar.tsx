@@ -5,10 +5,9 @@ import { MdSend } from "react-icons/md";
 import axios from "axios";
 import { ADD_IMAGE_MESSAGE_ROUTE, ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import { useChatReducer } from "@/context/ChatContext";
-import {  useStateProvider } from "@/context/StateContext";
+import { useStateProvider } from "@/context/StateContext";
 import { useSocketReducer } from "@/context/SocketContext";
 import EmojiPicker from "emoji-picker-react";
-import PhotoPicker from "../PhotoPicker";
 import dynamic from "next/dynamic";
 import { MessageType } from "./ChatContainer";
 
@@ -19,13 +18,12 @@ const MessageBar = () => {
   const { currentChatUser, setChatMessages } = useChatReducer();
   const { data } = useStateProvider();
   const [shwoEmojiPicker, setShowEmojiPicker] = useState(false);
-  const [grabPhoto, setGrabPhoto] = useState(false);
-  const [image, setImage] = useState("");
   const { ContextSocket } = useSocketReducer();
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
+  const [isSending, setIsSending] = useState(false);
 
   const emojiRef = useRef(null);
-  const fileInputRef = useRef(null); // ✅ Ref for the file input
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event: { target: { id: string } }) => {
@@ -50,8 +48,9 @@ const MessageBar = () => {
   };
 
   const handleSend = async () => {
-    if (!message) return;
+    if (!message.trim() || isSending) return;
 
+    setIsSending(true);
     try {
       const recieverId = currentChatUser?.id || null;
       const senderId = data?.id || null;
@@ -63,7 +62,7 @@ const MessageBar = () => {
       });
 
       if (res.data.status) {
-        setChatMessages((prev: MessageType) =>[...prev, res.data.msg]);
+        setChatMessages((prev: MessageType[]) => [...prev, res.data.msg]);
 
         ContextSocket.emit("send-msg", {
           to: currentChatUser.id,
@@ -75,6 +74,8 @@ const MessageBar = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -83,7 +84,7 @@ const MessageBar = () => {
       const file = e.target.files[0];
 
       const formdata = new FormData();
-      formdata.append("image", file);
+      formdata.append("image", file as Blob);
       formdata.append("recieverId", currentChatUser?.id || "");
       formdata.append("senderId", data?.id || "");
 
@@ -94,7 +95,7 @@ const MessageBar = () => {
       });
 
       if (res.data.status) {
-        setChatMessages((prev: any) => [...prev, res.data.msg]);
+        setChatMessages((prev: MessageType[]) => [...prev, res.data.msg]);
         ContextSocket.emit("send-msg", {
           to: currentChatUser.id,
           from: data.id,
@@ -114,68 +115,77 @@ const MessageBar = () => {
 
   return (
     <div className="bg-panel-header-background h-20 px-4 flex items-center gap-6 relative">
-      {!showAudioRecorder &&(<>
-      <div className="flex gap-6">
-        <BsEmojiSmile
-          className="text-panel-header-icon text-xl cursor-pointer"
-          title="Emoji"
-          onClick={handleEmojiModal}
-          id="emoji-opener"
-        />
-        {shwoEmojiPicker && (
-          <div ref={emojiRef} className="absolute bottom-24 left-16 z-40">
-            <EmojiPicker theme="dark" onEmojiClick={handleEmojiClick} />
+      {!showAudioRecorder && (
+        <>
+          <div className="flex gap-6">
+            <BsEmojiSmile
+              className="text-panel-header-icon text-xl cursor-pointer"
+              title="Emoji"
+              onClick={handleEmojiModal}
+              id="emoji-opener"
+            />
+            {shwoEmojiPicker && (
+              <div ref={emojiRef} className="absolute bottom-24 left-16 z-40">
+                <EmojiPicker theme="dark" onEmojiClick={handleEmojiClick} />
+              </div>
+            )}
+
+            <input
+              type="file"
+              hidden
+              ref={fileInputRef}
+              onChange={handlePhotoChange}
+              accept="image/*"
+            />
+
+            <ImAttachment
+              className="text-panel-header-icon text-xl cursor-pointer"
+              title="Attach"
+              onClick={() => fileInputRef.current?.click()}
+            />
           </div>
-        )}
 
-        {/* ✅ Hidden file input */}
-        <input
-          type="file"
-          hidden
-          ref={fileInputRef}
-          onChange={handlePhotoChange}
-          accept="image/*"
-        />
-
-        {/* ✅ Clicking this icon triggers input click */}
-        <ImAttachment
-          className="text-panel-header-icon text-xl cursor-pointer"
-          title="Attach"
-          onClick={() => fileInputRef.current?.click()}
-        />
-      </div>
-
-      <div className="w-full rounded-lg h-10 flex items-center">
-        <input
-          type="text"
-          placeholder="Type a message"
-          value={message}
-          onChange={(e) => SetMessage(e.target.value)}
-          className="bg-input-background text-start focus:outline-none text-white h-10 rounded-lg px-5 w-full"
-        />
-      </div>
-
-      <div className="flex w-10 items-center justify-center">
-        <button>
-          {message.length ? (
-            <MdSend
-              className="text-panel-header-icon text-xl cursor-pointer"
-              title="Send"
-              onClick={handleSend}
+          <div className="w-full rounded-lg h-10 flex items-center">
+            <input
+              type="text"
+              placeholder="Type a message"
+              value={message}
+              onChange={(e) => SetMessage(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              className="bg-input-background text-start focus:outline-none text-white h-10 rounded-lg px-5 w-full"
+              disabled={isSending}
             />
-          ) : (
-            <BsMic
-              className="text-panel-header-icon text-xl cursor-pointer"
-              title="Record"
-              onClick={handleRecorderChange}
-            />
-          )}
-        </button>
-      </div>
-      </>
-  )}
+          </div>
 
-      {grabPhoto && <PhotoPicker onChange={handlePhotoChange} />}
+          <div className="flex w-10 items-center justify-center">
+            <button disabled={isSending}>
+              {message.length ? (
+                isSending ? (
+                  <div className="loader border-white border-2 border-t-transparent rounded-full w-5 h-5 animate-spin" />
+                ) : (
+                  <MdSend
+                    className="text-panel-header-icon text-xl cursor-pointer"
+                    title="Send"
+                    onClick={handleSend}
+                  />
+                )
+              ) : (
+                <BsMic
+                  className="text-panel-header-icon text-xl cursor-pointer"
+                  title="Record"
+                  onClick={handleRecorderChange}
+                />
+              )}
+            </button>
+          </div>
+        </>
+      )}
+
       {showAudioRecorder && (
         <CaptureAudio hide={() => setShowAudioRecorder(false)} />
       )}
