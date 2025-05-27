@@ -8,6 +8,8 @@ import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import MessageStatus from "./Chat/MessageStatus";
 import { FaCamera, FaMicrophone } from "react-icons/fa";
+import { useSocketReducer } from "@/context/SocketContext";
+import { MessageType } from "./Chat/ChatContainer";
 
 type ContactUserType = {
   about: string;
@@ -36,8 +38,10 @@ export const List = () => {
     searchedUsers,
   } = useChatReducer();
 
+  const {ContextSocket} = useSocketReducer()
   const [loading, setLoading] = useState(false);
   const [searchedContacts, setSearchedContacts] = useState<ContactUserType[]>([]);
+  const [updatedMsgs, setUpdatedMsgs] = useState<MessageType[]>([]);
 
   useEffect(() => {
     const getContacts = async () => {
@@ -85,7 +89,17 @@ export const List = () => {
     );
   };
 
-  const contactList = searchedUsers ? searchedContacts : (userContacts as ContactUserType[]);
+  const contactList = searchedUsers  ? searchedContacts : userContacts as ContactUserType[];
+
+  useEffect(() => {
+
+    if(ContextSocket){
+    ContextSocket.on("msg-receive", (data) => {
+      console.log(data);
+      setUpdatedMsgs((prev) => [...prev, data.message]);
+    })
+    }
+  },[ContextSocket])
 
   if (loading) {
     return (
@@ -136,7 +150,13 @@ export const List = () => {
               )}
 
               {contact.type === "text" && (
-                <span className="truncate text-secondary">{contact.message}</span>
+                <span className="truncate text-secondary">
+                  {
+                    updatedMsgs.findLast((msg) => msg.senderId === contact.senderId)
+                      ? updatedMsgs.findLast((msg) => msg.senderId === contact.senderId)?.message
+                      : contact.message
+                  }
+                </span>
               )}
               {contact.type === "audio" && (
                 <span className="flex gap-1 items-center text-secondary">

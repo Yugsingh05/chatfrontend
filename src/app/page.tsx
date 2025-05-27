@@ -60,13 +60,11 @@ export default function Home() {
 
       // 📨 Message Received
       sock.on("msg-receive", (mess) => {
-        console.log("Message received:", mess);
+      
         setChatMessages((prev) => [...prev, mess.message]);
 
         const currentChat = currentChatUserRef.current;
         const userData = dataRef.current;
-
-        console.log("Current Chat:", currentChat, "User Data:", userData);
 
         if (
           sock.connected &&
