@@ -28,13 +28,22 @@ export default function Home() {
     setIncomingVideoCall,
     setIncomingVoiceCall,
     EndCall,
+    setOnlineUsers,
   } = useChatReducer();
-  const [socketEvent, setSocketEvent] = useState(false);
-  const { setOnlineUsers } = useChatReducer();
 
   const { setContextSocket } = useSocketReducer();
 
   const socket = useRef<Socket | null>(null);
+  const [socketEvent, setSocketEvent] = useState(false);
+
+  // 🔁 Refs to keep latest values
+  const currentChatUserRef = useRef(currentChatUser);
+  const dataRef = useRef(data);
+
+  useEffect(() => {
+    currentChatUserRef.current = currentChatUser;
+    dataRef.current = data;
+  }, [currentChatUser, data]);
 
   useEffect(() => {
     if (data) {
@@ -47,59 +56,62 @@ export default function Home() {
 
   useEffect(() => {
     if (socket.current && !socketEvent) {
-      socket.current.on("msg-receive", (mess) => {
-        console.log(mess);
+      const sock = socket.current;
+
+      // 📨 Message Received
+      sock.on("msg-receive", (mess) => {
+        console.log("Message received:", mess);
         setChatMessages((prev) => [...prev, mess.message]);
-        
-        if (socket.current?.connected && currentChatUser) {
-          socket.current.emit("mark-as-read-by-receiver", {
-            userId: currentChatUser?.id,
+
+        const currentChat = currentChatUserRef.current;
+        const userData = dataRef.current;
+
+        console.log("Current Chat:", currentChat, "User Data:", userData);
+
+        if (
+          sock.connected &&
+          userData?.id === mess.message.receiverId &&
+          currentChat?.id === mess.message.senderId
+        ) {
+          sock.emit("mark-as-read-by-receiver", {
+            userId: userData.id,
+            senderId: currentChat.id,
           });
         } else {
-          if (!currentChatUser) {
-            socket.current?.emit("mark-as-read-by-receiver", {
-              userId: mess.from,
-            });
-          }
-          console.warn("Socket not connected");
+          console.warn("Socket not connected or condition not met");
         }
       });
 
-      socket.current.on("incoming-voice-call", ({ from, roomId, callType }) => {
-        setIncomingVoiceCall({
-          ...from,
-          roomId,
-          callType,
-        });
+      // 📞 Call Events
+      sock.on("incoming-voice-call", ({ from, roomId, callType }) => {
+        setIncomingVoiceCall({ ...from, roomId, callType });
       });
 
-      socket.current.on("incoming-video-call", ({ from, roomId, callType }) => {
-        setIncomingVideoCall({
-          ...from,
-          roomId,
-          callType,
-        });
+      sock.on("incoming-video-call", ({ from, roomId, callType }) => {
+        setIncomingVideoCall({ ...from, roomId, callType });
       });
 
-      socket.current.on("voice-call-rejected", () => {
+      sock.on("voice-call-rejected", () => {
         EndCall();
       });
 
-      socket.current.on("video-call-rejected", () => {
-        console.log("video call rejected");
+      sock.on("video-call-rejected", () => {
+        console.log("Video call rejected");
         EndCall();
       });
 
-      socket.current.on("online-users", ({ onlineUsers }) => {
+      // ✅ Online Users
+      sock.on("online-users", ({ onlineUsers }) => {
         setOnlineUsers(onlineUsers);
       });
 
-      socket.current.on("mark-as-read", ({ userId, success }) => {
-        console.log("mark as read", userId, success);
+      // ✅ Mark Message As Read
+      sock.on("mark-as-read", ({ userId, success }) => {
+        console.log("Mark as read:", userId, success);
         if (success) {
           setChatMessages((prev) =>
             prev.map((msg) =>
-               msg.messageStatus !== "read"
+              msg.messageStatus !== "read"
                 ? { ...msg, messageStatus: "read" }
                 : msg
             )
@@ -109,7 +121,30 @@ export default function Home() {
 
       setSocketEvent(true);
     }
-  }, [socket.current]);
+  }, [
+    socketEvent,
+    setChatMessages,
+    setIncomingVoiceCall,
+    setIncomingVideoCall,
+    EndCall,
+    setOnlineUsers,
+  ]);
+
+useEffect(() => {
+  if (
+    socket.current &&
+    socket.current.connected &&
+    currentChatUser &&
+    data?.id
+  ) {
+    console.log("Emitting mark-as-read-by-receiver");
+
+    socket.current.emit("mark-as-read-by-receiver", {
+      userId: data.id, // receiver (current logged-in user)
+      senderId: currentChatUser.id, // the person you're chatting with
+    });
+  }
+}, [currentChatUser, data?.id]);
 
   return (
     <>
@@ -121,15 +156,16 @@ export default function Home() {
           <VideoCall />
         </div>
       )}
+
       {audioCall && (
         <div className="h-screen w-screen max-h-full overflow-hidden">
           <AudioCall />
         </div>
       )}
+
       {!videoCall && !audioCall && (
         <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen overflow-hidden">
           <ChatList contact={currentChatUser} />
-          {/* <Empty /> */}
           {currentChatUser ? (
             <div
               className={searchMessages ? "grid grid-cols-2" : "grid-cols-2"}
