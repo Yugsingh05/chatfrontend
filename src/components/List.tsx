@@ -41,7 +41,7 @@ export const List = () => {
   const {ContextSocket} = useSocketReducer()
   const [loading, setLoading] = useState(false);
   const [searchedContacts, setSearchedContacts] = useState<ContactUserType[]>([]);
-  const [updatedMsgs, setUpdatedMsgs] = useState<MessageType[]>([]);
+ 
 
   useEffect(() => {
     const getContacts = async () => {
@@ -96,7 +96,16 @@ export const List = () => {
     if(ContextSocket){
     ContextSocket.on("msg-receive", (data) => {
       console.log(data);
-      setUpdatedMsgs((prev) => [...prev, data.message]);
+     
+
+      setUserContacts((prevContacts) => 
+      prevContacts.map((contact) =>
+      (
+        console.log(contact.id, data.message.senderId),
+        contact.id === data.message.senderId ? { 
+          ...contact,
+          message: data.message.message,
+         totalUnreadMessages: contact.totalUnreadMessages? contact.totalUnreadMessages + 1 : 1 } : contact)))
     })
     }
   },[ContextSocket])
@@ -151,11 +160,10 @@ export const List = () => {
 
               {contact.type === "text" && (
                 <span className="truncate text-secondary">
-                  {
-                    updatedMsgs.findLast((msg) => msg.senderId === contact.senderId)
-                      ? updatedMsgs.findLast((msg) => msg.senderId === contact.senderId)?.message
-                      : contact.message
-                  }
+              
+
+                    {console.log(contact.message)}
+                  {contact.message}
                 </span>
               )}
               {contact.type === "audio" && (
