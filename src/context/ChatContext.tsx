@@ -40,11 +40,35 @@ export type Call = {
 }
 
 
-const ChatContext = createContext({});
+type ChatContextType = {
+  currentChatUser: user | undefined;
+  setCurrentChatUser: React.Dispatch<React.SetStateAction<user | undefined>>;
+  ChatMessages: MessageType[];
+  setChatMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
+  searchMessages: boolean;
+  setSearchMessages: React.Dispatch<React.SetStateAction<boolean>>;
+  userContacts: ContactUserType[];
+  setUserContacts: React.Dispatch<React.SetStateAction<ContactUserType[]>>;
+  onlineUsers: string[];
+  setOnlineUsers: React.Dispatch<React.SetStateAction<string[]>>;
+  searchedUsers: string;
+  setSearchedUsers: React.Dispatch<React.SetStateAction<string>>;
+  videoCall: Call | undefined;
+  setVideoCall: React.Dispatch<React.SetStateAction<Call | undefined>>;
+  audioCall: Call | undefined;
+  setAudioCall: React.Dispatch<React.SetStateAction<Call | undefined>>;
+  EndCall: () => void;
+  Incoming_Voice_Call: IncomingCall | undefined;
+  setIncomingVoiceCall: React.Dispatch<React.SetStateAction<IncomingCall | undefined>>;
+  Incoming_Video_Call: IncomingCall | undefined;
+  setIncomingVideoCall: React.Dispatch<React.SetStateAction<IncomingCall | undefined>>;
+};
+
+const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentChatUser, setCurrentChatUser] = useState(null);
-  const [ChatMessages, setChatMessages] = useState([]);
+  const [currentChatUser, setCurrentChatUser] = useState<user | undefined>(undefined);
+  const [ChatMessages, setChatMessages] = useState<MessageType[]>([]);
   const [searchMessages, setSearchMessages] = useState(false);
   const [userContacts, setUserContacts] = useState<ContactUserType[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
@@ -95,8 +119,8 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
 };
 
 const useChatReducer = (): {
-  currentChatUser: user;
-  setCurrentChatUser: React.Dispatch<React.SetStateAction<user>>;
+  currentChatUser: user | undefined;
+  setCurrentChatUser: React.Dispatch<React.SetStateAction<user | undefined>>;
   ChatMessages: MessageType[];
   setChatMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
   searchMessages: boolean;

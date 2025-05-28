@@ -126,8 +126,8 @@ const CaptureAudio = ({ hide } : { hide: () => void }) => {
         
         hide();
         setChatMessages((prev: MessageType[]) => [...prev, res.data.msg]);
-        ContextSocket.emit("send-msg", {
-          to: currentChatUser.id,
+        ContextSocket?.emit("send-msg", {
+          to: currentChatUser?.id,
           from: data.id,
           message: res.data.msg,
         });

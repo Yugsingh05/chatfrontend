@@ -12,7 +12,7 @@ const VideoCall = () => {
 
     useEffect(() => {
         if ( videoCall && videoCall.type === "out-going") {
-          ContextSocket.emit("outgoing-video-call", {
+          ContextSocket?.emit("outgoing-video-call", {
             to : videoCall.id,
             from : data,
             name : videoCall.name,
@@ -21,7 +21,7 @@ const VideoCall = () => {
           });
         }
           },
-       [videoCall])
+       [videoCall, ContextSocket, data])
 
        if(!videoCall) return null
   return (

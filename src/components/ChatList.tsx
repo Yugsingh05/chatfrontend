@@ -4,7 +4,7 @@ import { SearchBar } from "./SearchBar";
 import { List } from "./List";
 import ContactList from "./Chat/ContactList";
 
-const ChatList = ({contact}) => {
+const ChatList = () => {
   const [isAllContacts, setIsAllContacts] = useState(true);
   return (
     <div className="bg-panel-header-background flex flex-col max-h-screen z-20">

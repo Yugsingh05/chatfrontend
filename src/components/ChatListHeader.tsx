@@ -5,7 +5,7 @@ import { BsFillChatLeftTextFill, BsThreeDotsVertical } from "react-icons/bs";
 import ContextMenu from "./ContextMenu";
 import { useSocketReducer } from "@/context/SocketContext";
 
-export const ChatListHeader = ({ setContacts }) => {
+export const ChatListHeader = ({ setContacts } : {setContacts : React.Dispatch<React.SetStateAction<boolean>>}) => {
   const { data, handleLogout } = useStateProvider();
   const [contextMenuVisible, setContextMenuVisible] = React.useState(false);
   const {ContextSocket} = useSocketReducer();
@@ -19,7 +19,7 @@ export const ChatListHeader = ({ setContacts }) => {
       name: "Logout",
       callback: () => {
         handleLogout();
-        ContextSocket.emit("logout", { userId: data.id });
+        ContextSocket?.emit("logout", { userId: data.id });
         setContextMenuVisible(false);
       },
     },

@@ -11,6 +11,12 @@ import { MdOutlineCallEnd } from "react-icons/md";
 import { ZegoExpressEngine } from "zego-express-engine-webrtc";
 
 
+type streamListtype = {
+  streamID: string;
+  userID: string;
+  userName: string;
+  userAvatar: string;
+}
 
 const Container = ({ CallData }: { CallData: Call }) => {
   const { ContextSocket } = useSocketReducer();
@@ -18,7 +24,7 @@ const Container = ({ CallData }: { CallData: Call }) => {
   const { data } = useStateProvider();
 
   const [token, setToken] = useState<string>("");
-  const [zego, setZego] = useState<any>(null);
+  const [zego, setZego] = useState<ZegoExpressEngine | null>(null);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [callAccepted, setCallAccepted] = useState(false);
 
@@ -28,9 +34,9 @@ const Container = ({ CallData }: { CallData: Call }) => {
   const endCall = () => {
     // Emit rejection event
     if (CallData.callType === "audio") {
-      ContextSocket.emit("reject-voice-call", { from: CallData.id });
+      ContextSocket?.emit("reject-voice-call", { from: CallData.id });
     } else {
-      ContextSocket.emit("reject-video-call", { from: CallData.id });
+      ContextSocket?.emit("reject-video-call", { from: CallData.id });
     }
 
     // Clean up ZEGO resources
@@ -51,9 +57,9 @@ const Container = ({ CallData }: { CallData: Call }) => {
   useEffect(() => {
     if (CallData.type === "out-going") {
       const handleAccept = () => setCallAccepted(true);
-      ContextSocket.on("accept-call", handleAccept);
+      ContextSocket?.on("accept-call", handleAccept);
       return () => {
-        ContextSocket.off("accept-call", handleAccept);
+        ContextSocket?.off("accept-call", handleAccept);
       };
     } else {
       setCallAccepted(true);
@@ -131,10 +137,16 @@ const Container = ({ CallData }: { CallData: Call }) => {
           streamList: unknown[]
         ) => {
           if (updateType === "ADD") {
-            for (const streamInfo of streamList) {
+            for (const streamInfo  of streamList) {
               try {
+
+
+                const stream = streamInfo as streamListtype;
+              
+
+              
                 const remoteStream = await zg.startPlayingStream(
-                  streamInfo.streamID,
+                  stream.streamID,
                   {
                     audio: true,
                     video: CallData.callType === "video",
@@ -142,7 +154,7 @@ const Container = ({ CallData }: { CallData: Call }) => {
                 );
 
                 const videoEl = document.createElement("video");
-                videoEl.id = streamInfo.streamID;
+                videoEl.id = stream.streamID;
                 videoEl.autoplay = true;
                 videoEl.playsInline = true;
                 videoEl.muted = false;
@@ -161,7 +173,8 @@ const Container = ({ CallData }: { CallData: Call }) => {
 
           if (updateType === "DELETE") {
             for (const streamInfo of streamList) {
-              const el = document.getElementById(streamInfo.streamID);
+              const stream = streamInfo as streamListtype;
+              const el = document.getElementById(stream.streamID);
               if (el) el.remove();
             }
           }

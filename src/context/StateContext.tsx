@@ -7,7 +7,11 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
-export const StateContext = createContext({});
+export const StateContext = createContext<{
+  data: user;
+  setData: React.Dispatch<React.SetStateAction<user>>;
+  handleLogout: () => void;
+} | undefined>(undefined);
 
 export type user = {
     id : string,

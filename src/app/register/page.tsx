@@ -21,7 +21,7 @@ const Register = () => {
       router.push("/login")
 
     }
-  }, []);
+  }, [data, router]);
 
     const handleCreate = async() => {
 

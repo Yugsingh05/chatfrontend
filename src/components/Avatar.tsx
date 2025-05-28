@@ -65,8 +65,10 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
   
 
 
-  const photoPickerChange = async(e: { target: { files: Blob[] }; }) => {
-    const file = e.target.files[0];
+  const photoPickerChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    const file = files[0];
     const reader = new FileReader();
     const data = document.createElement("img");
     reader.onload = function (event) {
@@ -78,8 +80,7 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
     reader.readAsDataURL(file);
     setTimeout(() => {
       setImage(data.src);
-    },100)
-
+    }, 100);
   }
 
   if(!image) return null

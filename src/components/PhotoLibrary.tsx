@@ -1,7 +1,8 @@
 import Image from "next/image";
 import React from "react";
 import { IoClose } from "react-icons/io5";
-const PhotoLibrary = ({ setImage, setShowLibrary }) => {
+const PhotoLibrary = ({ setImage, setShowLibrary } : {setImage: React.Dispatch<React.SetStateAction<string>>, setShowLibrary: React.Dispatch<React.SetStateAction<boolean>>}) => {
+  
   const images = [
     "/avatars/1.png",
     "/avatars/2.png",

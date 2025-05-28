@@ -9,7 +9,7 @@ const MessageSearch = () => {
   const { setSearchMessages, currentChatUser, ChatMessages } = useChatReducer();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const [searchedMessages, setSearchedMessages] = useState([]);
+  const [searchedMessages, setSearchedMessages] = useState<MessageType[]>([]);
 
   useEffect(() => {
     
@@ -23,7 +23,7 @@ const MessageSearch = () => {
         })
       );
     }
-  },[searchTerm])
+  },[searchTerm, ChatMessages]);
 
   return (
     <div className="border-conversation-border border-1 w-full bg-conversation-panel-background flex flex-col min-h-screen border-b-4 border-b-icon-green max-h-screen z-10">
@@ -57,7 +57,7 @@ const MessageSearch = () => {
           </div>
           <span className="mt-10 text-secondary">
             {searchTerm.length > 0 &&
-              `Search for messages with ${currentChatUser.name}`}
+              `Search for messages with ${currentChatUser?.name}`}
           </span>
         </div>
         <div className="flex justify-center h-full flex-col">

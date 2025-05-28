@@ -10,15 +10,15 @@ const IncomingVoiceCall = () => {
   const { ContextSocket } = useSocketReducer();
 
   const acceptCall = () => {
-    setAudioCall({ ...Incoming_Voice_Call, type: "in-coming" });
+    if(Incoming_Voice_Call) setAudioCall({ ...Incoming_Voice_Call, type: "in-coming" });
 
-    ContextSocket.emit("accept-incoming-call", { id: Incoming_Voice_Call?.id });
+    ContextSocket?.emit("accept-incoming-call", { id: Incoming_Voice_Call?.id });
     setIncomingVoiceCall(undefined);
   };
 
   const rejectCall = () => {
    
-    ContextSocket.emit("reject-voice-call", {from : Incoming_Voice_Call?.id});
+    ContextSocket?.emit("reject-voice-call", {from : Incoming_Voice_Call?.id});
     EndCall();
     
   };

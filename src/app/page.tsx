@@ -52,7 +52,7 @@ export default function Home() {
       setContextSocket(socket.current);
       setSocketEvent(false);
     }
-  }, [data]);
+  }, [data,setContextSocket]);
 
   useEffect(() => {
     if (socket.current && !socketEvent) {
@@ -73,7 +73,7 @@ export default function Home() {
         ) {
           sock.emit("mark-as-read-by-receiver", {
             userId: userData.id,
-            senderId: currentChat.id,
+            senderId: currentChat?.id,
           });
         } else {
           console.warn("Socket not connected or condition not met");
@@ -163,7 +163,7 @@ useEffect(() => {
 
       {!videoCall && !audioCall && (
         <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen overflow-hidden">
-          <ChatList contact={currentChatUser} />
+          <ChatList  />
           {currentChatUser ? (
             <div
               className={searchMessages ? "grid grid-cols-2" : "grid-cols-2"}

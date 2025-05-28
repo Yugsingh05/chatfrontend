@@ -69,7 +69,7 @@ export const List = () => {
     };
 
     getContacts();
-  }, [data?.id]);
+  }, [data?.id, setUserContacts, setOnlineUsers]);
 
   useEffect(() => {
     if (searchedUsers?.trim() && userContacts?.length) {
@@ -132,11 +132,11 @@ export const List = () => {
     );
   };
 
-  ContextSocket.on("msg-receive", handleMessageReceive);
+  ContextSocket?.on("msg-receive", handleMessageReceive);
 
   // Clean up the listener when currentChatUser or ContextSocket changes
   return () => {
-    ContextSocket.off("msg-receive", handleMessageReceive);
+    ContextSocket?.off("msg-receive", handleMessageReceive);
   };
 }, [ContextSocket, currentChatUser?.id, setUserContacts]);
 

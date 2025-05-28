@@ -7,14 +7,12 @@ import axios from "axios";
 import { GET_MESSAGES_ROUTE } from "@/utils/ApiRoutes";
 import { useStateProvider } from "@/context/StateContext";
 import { LoaderCircle } from "lucide-react";
-import { useSocketReducer } from "@/context/SocketContext";
 
 const Chat = () => {
   const { currentChatUser, setChatMessages } = useChatReducer();
   const { data } = useStateProvider();
   const [loading, setLoading] = useState(false);
 
-  const {ContextSocket} = useSocketReducer()
 
   useEffect(() => {
     async function getData() {
@@ -38,7 +36,7 @@ const Chat = () => {
       }
     }
     if (currentChatUser) getData();
-  }, [currentChatUser]);
+  }, [currentChatUser,data.id,setChatMessages]);
 
 
   if (loading)

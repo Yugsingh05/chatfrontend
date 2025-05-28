@@ -7,7 +7,7 @@ import { ADD_IMAGE_MESSAGE_ROUTE, ADD_MESSAGE_ROUTE } from "@/utils/ApiRoutes";
 import { useChatReducer } from "@/context/ChatContext";
 import { useStateProvider } from "@/context/StateContext";
 import { useSocketReducer } from "@/context/SocketContext";
-import EmojiPicker from "emoji-picker-react";
+import EmojiPicker, { Theme } from "emoji-picker-react";
 import dynamic from "next/dynamic";
 import { MessageType } from "./ChatContainer";
 
@@ -21,14 +21,19 @@ const MessageBar = () => {
   const { ContextSocket } = useSocketReducer();
   const [showAudioRecorder, setShowAudioRecorder] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const darkTheme: Theme = Theme.DARK;
 
-  const emojiRef = useRef(null);
-  const fileInputRef = useRef(null);
+  const emojiRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: { target: { id: string } }) => {
-      if (event.target.id !== "emoji-opener") {
-        if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target && target.id !== "emoji-opener") {
+        if (
+          emojiRef.current &&
+          !(emojiRef.current as HTMLElement).contains(target)
+        ) {
           setShowEmojiPicker(false);
         }
       }
@@ -64,8 +69,8 @@ const MessageBar = () => {
       if (res.data.status) {
         setChatMessages((prev: MessageType[]) => [...prev, res.data.msg]);
 
-        ContextSocket.emit("send-msg", {
-          to: currentChatUser.id,
+        ContextSocket?.emit("send-msg", {
+          to: currentChatUser?.id,
           from: data.id,
           message: res.data.msg,
         });
@@ -92,12 +97,14 @@ const MessageBar = () => {
     }
   };
 
-  const handlePhotoChange = async (e: { target: { files: unknown[] } }) => {
+  const handlePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     try {
-      const file = e.target.files[0];
+      const files = e.target.files;
+      if (!files || files.length === 0) return;
+      const file = files[0];
 
       const formdata = new FormData();
-      formdata.append("image", file as Blob);
+      formdata.append("image", file);
       formdata.append("recieverId", currentChatUser?.id || "");
       formdata.append("senderId", data?.id || "");
 
@@ -113,14 +120,14 @@ const MessageBar = () => {
         setUserContacts((prevContacts) =>
           prevContacts.map((contact) =>(
 
-            console.log(contact , currentChatUser.id),
+            console.log(contact , currentChatUser?.id),
             contact.id === currentChatUser?.id
               ? { ...contact,message:res.data.msg}
               : contact)
           )
         );
-        ContextSocket.emit("send-msg", {
-          to: currentChatUser.id,
+        ContextSocket?.emit("send-msg", {
+          to: currentChatUser?.id,
           from: data.id,
           message: res.data.msg,
         });
@@ -150,7 +157,7 @@ const MessageBar = () => {
             />
             {shwoEmojiPicker && (
               <div ref={emojiRef} className="absolute bottom-24 left-16 z-40">
-                <EmojiPicker theme="dark" onEmojiClick={handleEmojiClick} />
+                <EmojiPicker  theme={darkTheme}  onEmojiClick={handleEmojiClick} />
               </div>
             )}
 

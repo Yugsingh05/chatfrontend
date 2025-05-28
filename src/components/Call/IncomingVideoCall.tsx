@@ -14,13 +14,13 @@ const IncomingVideoCall = () => {
       setVideoCall({ ...Incoming_Video_Call, type: "in-coming" });
     }
 
-    ContextSocket.emit("accept-incoming-call", { id: Incoming_Video_Call?.id });
+    ContextSocket?.emit("accept-incoming-call", { id: Incoming_Video_Call?.id });
     setIncomingVideoCall(undefined);
   };
 
   const rejectCall = () => {
    
-    ContextSocket.emit("reject-video-call", {from : Incoming_Video_Call?.id});
+    ContextSocket?.emit("reject-video-call", {from : Incoming_Video_Call?.id});
     EndCall();
     
   };

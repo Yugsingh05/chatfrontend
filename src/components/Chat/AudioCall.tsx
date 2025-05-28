@@ -15,7 +15,7 @@ const AudioCall = () => {
 
     useEffect(() => {
         if (audioCall && audioCall.type === "out-going") {
-          ContextSocket.emit("outgoing-voice-call", {
+          ContextSocket?.emit("outgoing-voice-call", {
             to : audioCall.id,
             from : data,
             name : audioCall.name,
@@ -24,7 +24,7 @@ const AudioCall = () => {
           });
         }
           },
-       [audioCall])
+       [audioCall, ContextSocket, data])
 
        if(!audioCall) return null
   return (

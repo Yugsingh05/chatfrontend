@@ -11,7 +11,7 @@ import ContextMenu from "../ContextMenu";
 const ChatHeader = () => {
   const { currentChatUser, setSearchMessages, setVideoCall, setAudioCall ,setCurrentChatUser,EndCall , onlineUsers} =
     useChatReducer();
-  const [dataOfUser, setDataOfUser] = useState<user | null>(null);
+  const [dataOfUser, setDataOfUser] = useState<user | undefined>(undefined);
   const [contextmenuCoordinates, setContextmenuCoordinates] = useState<{
     x: number;
     y: number;
@@ -24,16 +24,21 @@ const ChatHeader = () => {
   }, [currentChatUser]);
 
   const handleVoiceCall = () => {
+    if (!currentChatUser?.id) return;
     setAudioCall({
       ...currentChatUser,
+      id: currentChatUser.id,
       type: "out-going",
       callType: "audio",
       roomId: Date.now(),
     });
   };
+
   const handleVideoCall = () => {
-    setVideoCall({
+
+    if(currentChatUser)  setVideoCall({
       ...currentChatUser,
+      id: currentChatUser.id,
       type: "out-going",
       callType: "video",
       roomId: Date.now(),
@@ -70,7 +75,7 @@ const ChatHeader = () => {
             {dataOfUser?.name || "User"}
           </span>
           <span className="text-secondary text-sm">{
-          onlineUsers.includes(currentChatUser.id) ? "Online" : "Offline" }</span>
+          onlineUsers.includes(currentChatUser?.id || "") ? "Online" : "Offline" }</span>
         </div>
       </div>
       <div className="flex gap-6">

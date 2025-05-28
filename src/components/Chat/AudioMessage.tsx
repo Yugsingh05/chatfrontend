@@ -2,8 +2,9 @@ import { useRef, useState, useEffect } from "react";
 import { Play, Pause } from "lucide-react";
 import MessageStatus from "./MessageStatus";
 import { calculateTime } from "@/utils/CalculateTime";
+import { MessageType } from "./ChatContainer";
 
-function AudioMessage({ message, isOutgoing }: any) {
+function AudioMessage({ message, isOutgoing }: { message: MessageType; isOutgoing: boolean }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);

@@ -1,61 +1,37 @@
-export const calculateTime = (inputDateStr: string | number | Date) => {
-  // Assuming the input date string is in UTC format
-  const inputDate = new Date(inputDateStr);
+type TimeOrDateResult = string;
 
-  // Get current date
+export const calculateTime = (inputDateStr: string | number | Date): TimeOrDateResult => {
+  const inputDate = new Date(inputDateStr);
   const currentDate = new Date();
 
-  // Set up date formats
-  const timeFormat = { hour: "numeric", minute: "numeric" };
-  const dateFormat = {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
+  // Normalize both dates to local midnight (no time component) for day comparison
+  const normalizeDate = (date: Date): Date => {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
   };
 
-  // Check if it's today, tomorrow, or more than one day ago
-  if (
-    inputDate.getUTCDate() === currentDate.getUTCDate() &&
-    inputDate.getUTCMonth() === currentDate.getUTCMonth() &&
-    inputDate.getUTCFullYear() === currentDate.getUTCFullYear()
-  ) {
-    // Today: Convert to AM/PM format
-    const ampmTime = inputDate.toLocaleTimeString("en-US", timeFormat);
-    return ampmTime;
-  } else if (
-    inputDate.getUTCDate() === currentDate.getUTCDate() - 1 &&
-    inputDate.getUTCMonth() === currentDate.getUTCMonth() &&
-    inputDate.getUTCFullYear() === currentDate.getUTCFullYear()
-  ) {
-    // Tomorrow: Show "Yesterday"
+  const inputNormalized = normalizeDate(inputDate);
+  const currentNormalized = normalizeDate(currentDate);
 
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const dayDiff = Math.floor((currentNormalized.getTime() - inputNormalized.getTime()) / msPerDay);
+
+  const timeFormat: Intl.DateTimeFormatOptions = { hour: "numeric", minute: "numeric" };
+  const dateFormat: Intl.DateTimeFormatOptions = { day: "2-digit", month: "2-digit", year: "numeric" };
+
+  if (dayDiff === 0) {
+    // Today
+    return inputDate.toLocaleTimeString("en-US", timeFormat);
+  } else if (dayDiff === 1) {
+    // Yesterday
     return "Yesterday";
-  } else if (
-    Math.floor((currentDate - inputDate) / (1000 * 60 * 60 * 24)) > 1 &&
-    Math.floor((currentDate - inputDate) / (1000 * 60 * 60 * 24)) <= 7
-  ) {
-    const timeDifference = Math.floor(
-      (currentDate - inputDate) / (1000 * 60 * 60 * 24)
-    );
-
-    const targetDate = new Date();
-    targetDate.setDate(currentDate.getDate() - timeDifference);
-
+  } else if (dayDiff > 1 && dayDiff <= 7) {
+    // Within the past week
     const daysOfWeek = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
+      "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
     ];
-    const targetDay = daysOfWeek[targetDate.getDay()];
-
-    return targetDay;
+    return daysOfWeek[inputDate.getDay()];
   } else {
-    // More than 7 days ago: Show date in DD/MM/YYYY format
-    const formattedDate = inputDate.toLocaleDateString("en-GB", dateFormat);
-    return formattedDate;
+    // Older than a week
+    return inputDate.toLocaleDateString("en-GB", dateFormat);
   }
 };
