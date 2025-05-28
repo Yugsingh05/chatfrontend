@@ -101,6 +101,7 @@ export const List = () => {
   if (!ContextSocket) return;
 
   const handleMessageReceive = (data) => {
+    console.log(data);  
     setUserContacts((prevContacts) =>
       prevContacts.map((contact) => {
         const isCurrentChatUser = currentChatUser?.id === contact.id;
@@ -114,6 +115,7 @@ export const List = () => {
           totalUnreadMessages: isCurrentChatUser
             ? 0
             : (contact.totalUnreadMessages || 0) + 1,
+            type : data.message.type
         };
       })
     );

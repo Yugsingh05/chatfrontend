@@ -75,7 +75,7 @@ const MessageBar = () => {
           prevContacts.map(contact => {
 
           return contact.id === currentChatUser?.id
-              ? { ...contact, totalUnreadMessages: 0 ,message:res.data.msg.message}
+              ? { ...contact, totalUnreadMessages: 0 ,message:res.data.msg.message , type:res.data.msg.type}
               : contact
            
           
