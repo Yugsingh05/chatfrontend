@@ -36,12 +36,14 @@ export const List = () => {
     setCurrentChatUser,
     onlineUsers,
     searchedUsers,
+    currentChatUser,
   } = useChatReducer();
 
-  const {ContextSocket} = useSocketReducer()
+  const { ContextSocket } = useSocketReducer();
   const [loading, setLoading] = useState(false);
-  const [searchedContacts, setSearchedContacts] = useState<ContactUserType[]>([]);
- 
+  const [searchedContacts, setSearchedContacts] = useState<ContactUserType[]>(
+    []
+  );
 
   useEffect(() => {
     const getContacts = async () => {
@@ -84,31 +86,47 @@ export const List = () => {
     setCurrentChatUser(user);
     setUserContacts((prevContacts) =>
       prevContacts.map((contact) =>
-        contact.id === user.id ? { ...contact, totalUnreadMessages: 0 } : contact
+        contact.id === user.id
+          ? { ...contact, totalUnreadMessages: 0 }
+          : contact
       )
     );
   };
 
-  const contactList = searchedUsers  ? searchedContacts : userContacts as ContactUserType[];
+  const contactList = searchedUsers
+    ? searchedContacts
+    : (userContacts as ContactUserType[]);
 
-  useEffect(() => {
+ useEffect(() => {
+  if (!ContextSocket) return;
 
-    if(ContextSocket){
-    ContextSocket.on("msg-receive", (data) => {
-      console.log(data);
-     
+  const handleMessageReceive = (data) => {
+    setUserContacts((prevContacts) =>
+      prevContacts.map((contact) => {
+        const isCurrentChatUser = currentChatUser?.id === contact.id;
+        const isSender = contact.id === data.message.senderId;
 
-      setUserContacts((prevContacts) => 
-      prevContacts.map((contact) =>
-      (
-        console.log(contact.id, data.message.senderId),
-        contact.id === data.message.senderId ? { 
+        if (!isSender) return contact;
+
+        return {
           ...contact,
           message: data.message.message,
-         totalUnreadMessages: contact.totalUnreadMessages? contact.totalUnreadMessages + 1 : 1 } : contact)))
-    })
-    }
-  },[ContextSocket])
+          totalUnreadMessages: isCurrentChatUser
+            ? 0
+            : (contact.totalUnreadMessages || 0) + 1,
+        };
+      })
+    );
+  };
+
+  ContextSocket.on("msg-receive", handleMessageReceive);
+
+  // Clean up the listener when currentChatUser or ContextSocket changes
+  return () => {
+    ContextSocket.off("msg-receive", handleMessageReceive);
+  };
+}, [ContextSocket, currentChatUser?.id, setUserContacts]);
+
 
   if (loading) {
     return (
@@ -136,7 +154,12 @@ export const List = () => {
         >
           <div className="flex items-center gap-3">
             <div className="flex items-center justify-center w-10 h-10 rounded-full bg-panel-header-icon">
-              <Image src={contact.profileImage} width={40} height={40} alt="Profile" />
+              <Image
+                src={contact.profileImage}
+                width={40}
+                height={40}
+                alt="Profile"
+              />
             </div>
 
             <div className="flex flex-col">
@@ -148,7 +171,9 @@ export const List = () => {
 
               <span
                 className={`${
-                  contact.totalUnreadMessages > 0 ? "text-icon-green" : "text-secondary"
+                  contact.totalUnreadMessages > 0
+                    ? "text-icon-green"
+                    : "text-secondary"
                 } text-sm`}
               >
                 {calculateTime(contact.createdAt)}
@@ -160,9 +185,6 @@ export const List = () => {
 
               {contact.type === "text" && (
                 <span className="truncate text-secondary">
-              
-
-                    {console.log(contact.message)}
                   {contact.message}
                 </span>
               )}
