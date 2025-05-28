@@ -15,7 +15,7 @@ const CaptureAudio = dynamic(() => import("./CaptureAudio"), { ssr: false });
 
 const MessageBar = () => {
   const [message, SetMessage] = useState("");
-  const { currentChatUser, setChatMessages } = useChatReducer();
+  const { currentChatUser, setChatMessages ,setUserContacts} = useChatReducer();
   const { data } = useStateProvider();
   const [shwoEmojiPicker, setShowEmojiPicker] = useState(false);
   const { ContextSocket } = useSocketReducer();
@@ -70,6 +70,19 @@ const MessageBar = () => {
           message: res.data.msg,
         });
 
+        console.log(res.data.msg);
+         setUserContacts((prevContacts) =>
+          prevContacts.map(contact => {
+
+          return contact.id === currentChatUser?.id
+              ? { ...contact, totalUnreadMessages: 0 ,message:res.data.msg.message}
+              : contact
+           
+          
+          }
+          )
+        );
+
         SetMessage("");
       }
     } catch (error) {
@@ -96,11 +109,22 @@ const MessageBar = () => {
 
       if (res.data.status) {
         setChatMessages((prev: MessageType[]) => [...prev, res.data.msg]);
+
+        setUserContacts((prevContacts) =>
+          prevContacts.map((contact) =>(
+
+            console.log(contact , currentChatUser.id),
+            contact.id === currentChatUser?.id
+              ? { ...contact,message:res.data.msg}
+              : contact)
+          )
+        );
         ContextSocket.emit("send-msg", {
           to: currentChatUser.id,
           from: data.id,
           message: res.data.msg,
         });
+        
       }
 
       console.log(res.data);
