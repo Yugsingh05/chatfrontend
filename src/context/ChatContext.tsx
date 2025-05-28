@@ -3,20 +3,57 @@ import { createContext, useContext, useState } from "react";
 import { user } from "./StateContext";
 import { MessageType } from "@/components/Chat/ChatContainer";
 
+
+
+type ContactUserType = {
+  about: string;
+  createdAt: string;
+  email: string;
+  id: string;
+  message: string;
+  messageId: string;
+  messageStatus: string;
+  name: string;
+  profileImage: string;
+  receiverId: string;
+  senderId: string;
+  totalUnreadMessages: number;
+  type: string;
+};
+
+export type IncomingCall = {
+  id: string;
+  name: string;
+  profileImage: string;
+  callType: "audio" | "video";
+  type: "in-coming" | "out-going";
+  roomId: number;
+}
+
+export type Call = {
+  id : string;
+  name : string;
+  profileImage : string;
+  callType : "audio" | "video";
+  type : "in-coming" | "out-going";
+  roomId : number;
+}
+
+
 const ChatContext = createContext({});
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentChatUser, setCurrentChatUser] = useState(null);
   const [ChatMessages, setChatMessages] = useState([]);
   const [searchMessages, setSearchMessages] = useState(false);
-  const [userContacts, setUserContacts] = useState([]);
+  const [userContacts, setUserContacts] = useState<ContactUserType[]>([]);
   const [onlineUsers, setOnlineUsers] = useState<string[]>([]);
   const [searchedUsers, setSearchedUsers] = useState<string>("");
-  const [videoCall, setVideoCall] = useState(undefined);
-  const [audioCall, setAudioCall] = useState(undefined);
+  const [videoCall, setVideoCall] = useState<Call | undefined>(undefined);
+  const [audioCall, setAudioCall] = useState<Call | undefined>(undefined);
 
-  const [Incoming_Voice_Call, setIncomingVoiceCall] = useState(undefined);
-  const [Incoming_Video_Call, setIncomingVideoCall] = useState(undefined);
+  const [Incoming_Voice_Call, setIncomingVoiceCall] = useState<IncomingCall | undefined>(undefined);
+  const [Incoming_Video_Call, setIncomingVideoCall] = useState<IncomingCall | undefined>(undefined);
 
   const EndCall = () => {
     setVideoCall(undefined);
@@ -64,21 +101,21 @@ const useChatReducer = (): {
   setChatMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
   searchMessages: boolean;
   setSearchMessages: React.Dispatch<React.SetStateAction<boolean>>;
-  userContacts: user[];
-  setUserContacts: React.Dispatch<React.SetStateAction<user[]>>;
+  userContacts: ContactUserType[];
+  setUserContacts: React.Dispatch<React.SetStateAction<ContactUserType[]>>;
   onlineUsers: string[];
   setOnlineUsers: React.Dispatch<React.SetStateAction<string[]>>;
   searchedUsers: string;
   setSearchedUsers: React.Dispatch<React.SetStateAction<string>>;
-  videoCall: unknown;
-  setVideoCall: React.Dispatch<React.SetStateAction<unknown>>;
-  audioCall: unknown;
-  setAudioCall: React.Dispatch<React.SetStateAction<unknown>>;
+  videoCall: Call | undefined;
+  setVideoCall: React.Dispatch<React.SetStateAction<Call | undefined>>;
+  audioCall: Call | undefined;
+  setAudioCall: React.Dispatch<React.SetStateAction<Call | undefined>>;
   EndCall: () => void;
-  Incoming_Voice_Call: unknown;
-  setIncomingVoiceCall: React.Dispatch<React.SetStateAction<unknown>>;
-  Incoming_Video_Call: unknown;
-  setIncomingVideoCall: React.Dispatch<React.SetStateAction<unknown>>;
+  Incoming_Voice_Call: IncomingCall | undefined;
+  setIncomingVoiceCall: React.Dispatch<React.SetStateAction<IncomingCall | undefined>>;
+  Incoming_Video_Call: IncomingCall | undefined;
+  setIncomingVideoCall: React.Dispatch<React.SetStateAction<IncomingCall | undefined>>;
 } => {
   const context = useContext(ChatContext);
   if (!context) {

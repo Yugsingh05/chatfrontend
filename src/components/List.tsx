@@ -73,7 +73,7 @@ export const List = () => {
 
   useEffect(() => {
     if (searchedUsers?.trim() && userContacts?.length) {
-      const filtered = userContacts.filter((contact: ContactUserType) =>
+      const filtered = (userContacts).filter((contact) =>
         contact.name.toLowerCase().includes(searchedUsers.toLowerCase())
       );
       setSearchedContacts(filtered);
@@ -83,7 +83,18 @@ export const List = () => {
   }, [searchedUsers, userContacts]);
 
   const handleClick = (user: ContactUserType) => {
-    setCurrentChatUser(user);
+   console.log("user",user);
+   const {id , about , name , profileImage , email } = user
+    setCurrentChatUser({
+      id,
+      about,
+      name,
+      profileImage,
+      email,
+      status: true,
+      isNewUser: false
+
+    });
     setUserContacts((prevContacts) =>
       prevContacts.map((contact) =>
         contact.id === user.id
@@ -94,14 +105,14 @@ export const List = () => {
   };
 
   const contactList = searchedUsers
-    ? searchedContacts
-    : (userContacts as ContactUserType[]);
+    ? searchedContacts as ContactUserType[]
+    : userContacts ;
 
  useEffect(() => {
   if (!ContextSocket) return;
 
-  const handleMessageReceive = (data) => {
-    console.log(data);  
+  const handleMessageReceive = (data : {message : MessageType , type : string , totalUnreadMessages : number}) => {
+ 
     setUserContacts((prevContacts) =>
       prevContacts.map((contact) => {
         const isCurrentChatUser = currentChatUser?.id === contact.id;

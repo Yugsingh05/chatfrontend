@@ -9,10 +9,12 @@ const CapturePhoto = ({ setImage, setShowCapture }: Props) => {
   const videoRef = useRef(null);
 
   useEffect(() => {
-    let stream;
+    let stream: MediaStream;
     const startCamera = async () => {
         stream = await navigator.mediaDevices.getUserMedia({ video: true ,audio:false});
-        videoRef.current.srcObject = stream;
+        if (videoRef.current) {
+          (videoRef.current as HTMLVideoElement).srcObject = stream;
+        }
     };
     startCamera();
     return () => {
@@ -24,7 +26,9 @@ const CapturePhoto = ({ setImage, setShowCapture }: Props) => {
 
   const capturePhoto = () => {
     const canvas = document.createElement("canvas");
-    canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0, 300, 150);
+    if (videoRef.current) {
+      canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0, 300, 150);
+    }
     setImage(canvas.toDataURL("image/jpeg"));
     setShowCapture(false);
   };

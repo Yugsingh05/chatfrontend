@@ -48,11 +48,11 @@ export const StateProvider = ({children} : {children : React.ReactNode})  => {
         console.log(res.data);
 
         setData({
-          id: res.data.data.id,
-          name: res.data.data.name,
-          email: res.data.data.email,
-          profileImage: res.data.data.profileImage,
-          about: res.data.data.about,
+          id: res.data.data.id || "",
+          name: res.data.data.name || "",
+          email: res.data.data.email || "",
+          profileImage: res.data.data.profileImage || "",
+          about: res.data.data.about || "",
           status: true,
           isNewUser: false,
         });

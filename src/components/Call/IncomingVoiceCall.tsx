@@ -27,7 +27,7 @@ const IncomingVoiceCall = () => {
     <div className="h-24 w-80 fixed bottom-8 mb-8 right-6 z-50 rounded-sm flex gap-5 items-center justify-start p-4 bg-conversation-panel-background text-white drop-shadow-2xl border-icon-green border-2 py-14">
          <div className="">
            <Image
-             src={Incoming_Voice_Call.profileImage}
+             src={Incoming_Voice_Call?.profileImage || ""}
              alt="profileImage"
              width={50}
              height={50}
@@ -36,7 +36,7 @@ const IncomingVoiceCall = () => {
          </div>
    
          <div>
-           <div> {Incoming_Voice_Call.name}</div>
+           <div> {Incoming_Voice_Call?.name}</div>
            <div className="text-xs">Incoming voice Call</div>
            <div className="flex gap-2 mt-2">
              <button

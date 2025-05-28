@@ -32,12 +32,13 @@ const Register = () => {
         const res = await axios.post(REGISTER_USER_ROUTE, { email, name, about, image });
         console.log(res.data);
         setData({
+          id: data.id,
           name,
           email,
           about,
-          profileImage : image,
-           status : true,
-          isNewUser : true
+          profileImage: image,
+          status: true,
+          isNewUser: true
         })
         if(res.data.status) router.push("/");
       } catch (error) {

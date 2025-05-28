@@ -1,6 +1,6 @@
 "use client";
 
-import { useChatReducer } from "@/context/ChatContext";
+import { Call, useChatReducer } from "@/context/ChatContext";
 import { useSocketReducer } from "@/context/SocketContext";
 import { useStateProvider } from "@/context/StateContext";
 import { GET_CALL_TOKEN_ROUTE } from "@/utils/ApiRoutes";
@@ -8,17 +8,11 @@ import axios from "axios";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { MdOutlineCallEnd } from "react-icons/md";
+import { ZegoExpressEngine } from "zego-express-engine-webrtc";
 
-interface CallData {
-  id: string;
-  name: string;
-  profileImage: string;
-  callType: "audio" | "video";
-  type: "in-coming" | "out-going";
-  roomId: number;
-}
 
-const Container = ({ CallData }: { CallData: CallData }) => {
+
+const Container = ({ CallData }: { CallData: Call }) => {
   const { ContextSocket } = useSocketReducer();
   const { EndCall } = useChatReducer();
   const { data } = useStateProvider();
@@ -58,7 +52,9 @@ const Container = ({ CallData }: { CallData: CallData }) => {
     if (CallData.type === "out-going") {
       const handleAccept = () => setCallAccepted(true);
       ContextSocket.on("accept-call", handleAccept);
-      return () => ContextSocket.off("accept-call", handleAccept);
+      return () => {
+        ContextSocket.off("accept-call", handleAccept);
+      };
     } else {
       setCallAccepted(true);
     }
@@ -86,7 +82,7 @@ const Container = ({ CallData }: { CallData: CallData }) => {
   useEffect(() => {
     if (!token || !callAccepted) return;
 
-    let zg: any;
+    let zg: ZegoExpressEngine;
     let localStream: MediaStream | null = null;
 
     const initZego = async () => {
@@ -102,7 +98,7 @@ const Container = ({ CallData }: { CallData: CallData }) => {
           throw new Error("ZEGO credentials are not set properly.");
         }
 
-        zg = new ZegoExpressEngine(appId, true); // Test environment
+        zg = new ZegoExpressEngine(appId, serverSecret); // Test environment /// check this is the video call or audio call is not working make the serversecret as  true
         zg.setLogConfig({
           logLevel: "debug",
           remoteLogLevel: "info",
@@ -132,7 +128,7 @@ const Container = ({ CallData }: { CallData: CallData }) => {
         const roomStreamUpdate = async (
           roomId: string,
           updateType: string,
-          streamList: any[]
+          streamList: unknown[]
         ) => {
           if (updateType === "ADD") {
             for (const streamInfo of streamList) {

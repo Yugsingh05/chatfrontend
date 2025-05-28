@@ -29,7 +29,7 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
     if(grabPhoto){
       const data = document.getElementById("photo-picker");
       data?.click();
-      document.body.onfocus = (e) => {
+      document.body.onfocus = () => {
         setTimeout(() => {
           setGrabPhoto(false);
         },1000)
@@ -65,13 +65,15 @@ const Avatar = ({ type, image, setImage }: AvatarPTops) => {
   
 
 
-  const photoPickerChange = async(e) => {
+  const photoPickerChange = async(e: { target: { files: Blob[] }; }) => {
     const file = e.target.files[0];
     const reader = new FileReader();
     const data = document.createElement("img");
     reader.onload = function (event) {
-      data.src = event.target?.result;
-      data.setAttribute("data-src",event.target?.result);
+      if (typeof event.target?.result === "string") {
+        data.src = event.target.result;
+        data.setAttribute("data-src", event.target.result);
+      }
     };
     reader.readAsDataURL(file);
     setTimeout(() => {
