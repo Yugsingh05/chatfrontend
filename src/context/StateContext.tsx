@@ -37,13 +37,15 @@ export const StateProvider = ({children} : {children : React.ReactNode})  => {
 
     useEffect(() => {
     const unsubscribe = onAuthStateChanged(firebaseAuth, async (currentUser) => {
-      if (!currentUser || !currentUser.email) {
+     
+      if (!currentUser || !currentUser.email?.length) {
         router.push("/login");
         return;
       }
 
       try {
         const res = await axios.post(CHECK_USER_ROUTE, { email: currentUser.email });
+        console.log(res.data)
 
         if (!res.data.status) {
           router.push("/register");
