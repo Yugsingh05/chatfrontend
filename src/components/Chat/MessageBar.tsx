@@ -122,7 +122,7 @@ const MessageBar = () => {
 
             console.log(contact , currentChatUser?.id),
             contact.id === currentChatUser?.id
-              ? { ...contact,message:res.data.msg}
+              ? { ...contact,message: res.data.msg.message , type:res.data.msg.type }
               : contact)
           )
         );
@@ -199,11 +199,13 @@ const MessageBar = () => {
                 isSending ? (
                   <div className="loader border-white border-2 border-t-transparent rounded-full w-5 h-5 animate-spin" />
                 ) : (
+                  
                   <MdSend
                     className="text-panel-header-icon text-xl cursor-pointer"
                     title="Send"
                     onClick={handleSend}
                   />
+                  
                 )
               ) : (
                 <BsMic

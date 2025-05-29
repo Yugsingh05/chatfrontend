@@ -9,10 +9,10 @@ import { MdSend } from "react-icons/md";
 import WaveSurfer from "wavesurfer.js";
 import { MessageType } from "./ChatContainer";
 
-const CaptureAudio = ({ hide } : { hide: () => void }) => {
+const CaptureAudio = ({ hide }: { hide: () => void }) => {
   const { data } = useStateProvider();
-  const { currentChatUser, setChatMessages  }  = useChatReducer();
-  const {  ContextSocket } = useSocketReducer();
+  const { currentChatUser, setChatMessages } = useChatReducer();
+  const { ContextSocket } = useSocketReducer();
 
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
@@ -31,46 +31,59 @@ const CaptureAudio = ({ hide } : { hide: () => void }) => {
     let timer: NodeJS.Timeout;
     if (isRecording) {
       timer = setInterval(() => {
-        setRecordingDuration(d => d + 1);
+        setRecordingDuration((d) => d + 1);
       }, 1000);
     }
     return () => clearInterval(timer);
   }, [isRecording]);
 
-  // Initialize Wavesurfer
+  // Cleanup waveform on unmount
   useEffect(() => {
-    if (!waveformRef.current) return;
-    const ws = WaveSurfer.create({
-      container: waveformRef.current,
-      waveColor: "#ccc",
-      progressColor: "#4a9eff",
-      cursorColor: "#7ae3c3",
-      barWidth: 2,
-      height: 30,
-      responsive: true,
-      normalize: true,
-    });
-    ws.on("finish", () => {/* you can reset play state here */});
-    setWaveform(ws);
-    return () => ws.destroy();
-  }, []);
+    return () => {
+      if (waveform) {
+        waveform.destroy();
+      }
+    };
+  }, [waveform]);
 
   const handleStartRecording = () => {
+    setRecordedAudioUrl(null);
+    setAudioBlob(null);
     setRecordingDuration(0);
+
+    // Proper cleanup of existing waveform
+    if (waveform) {
+      waveform.destroy();
+      setWaveform(null);
+    }
+
     chunksRef.current = [];
     navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => {
+      .then((stream) => {
         const mr = new MediaRecorder(stream);
         mediaRecorderRef.current = mr;
         audioRef.current!.srcObject = stream;
 
-        mr.ondataavailable = e => chunksRef.current.push(e.data);
+        mr.ondataavailable = (e) => chunksRef.current.push(e.data);
         mr.onstop = () => {
           const blob = new Blob(chunksRef.current, { type: "audio/mp3" });
           const url = URL.createObjectURL(blob);
           setAudioBlob(blob);
           setRecordedAudioUrl(url);
-          waveform!.load(url);
+
+          const ws = WaveSurfer.create({
+            container: waveformRef.current!,
+            waveColor: "#ccc",
+            progressColor: "#4a9eff",
+            cursorColor: "#7ae3c3",
+            barWidth: 2,
+            height: 30,
+            responsive: true,
+            normalize: true,
+          });
+          ws.on("finish", () => setIsPlaying(false));
+          ws.load(url);
+          setWaveform(ws);
         };
 
         mr.start();
@@ -93,9 +106,9 @@ const CaptureAudio = ({ hide } : { hide: () => void }) => {
       audioRef.current!.play();
     }
   };
+
   const handlePause = () => {
     if (recordedAudioUrl && waveform) {
-
       setIsPlaying(false);
       waveform.pause();
       audioRef.current!.pause();
@@ -107,6 +120,7 @@ const CaptureAudio = ({ hide } : { hide: () => void }) => {
       console.log("No audio recorded");
       return;
     }
+
     try {
       const formdata = new FormData();
       formdata.append("audio", audioBlob, "audio.mp3");
@@ -121,11 +135,16 @@ const CaptureAudio = ({ hide } : { hide: () => void }) => {
         setAudioBlob(null);
         setIsRecording(false);
         setRecordedAudioUrl(null);
-        setWaveform(null);
         setRecordingDuration(0);
-        
+
+        if (waveform) {
+          waveform.destroy();
+          setWaveform(null);
+        }
+
         hide();
         setChatMessages((prev: MessageType[]) => [...prev, res.data.msg]);
+
         ContextSocket?.emit("send-msg", {
           to: currentChatUser?.id,
           from: data.id,
@@ -146,29 +165,32 @@ const CaptureAudio = ({ hide } : { hide: () => void }) => {
 
   return (
     <div className="flex text-2xl w-full justify-center items-center">
-      <FaTrash onClick={hide} className="cursor-pointer  text-white" />
+      <FaTrash onClick={hide} className="cursor-pointer text-white" />
       <div className="mx-4 py-2 px-4 bg-search-input-container-background text-white rounded-full flex items-center gap-4 drop-shadow-lg">
-        {isRecording
-          ? <span className="text-red-500 animate-pulse">Recording {formatTime(recordingDuration)}</span>
-          : (
-            recordedAudioUrl && (
-
-              <button >
-                              {isPlaying ? <FaPause onClick={handlePause} className="cursor-pointer" /> : <FaPlay onClick={handlePlay} className="cursor-pointer"/>}
-
-              </button>
-            )
+        {isRecording ? (
+          <span className="text-red-500 animate-pulse">Recording {formatTime(recordingDuration)}</span>
+        ) : (
+          recordedAudioUrl && (
+            <button>
+              {isPlaying ? (
+                <FaPause onClick={handlePause} className="cursor-pointer" />
+              ) : (
+                <FaPlay onClick={handlePlay} className="cursor-pointer" />
+              )}
+            </button>
           )
-        }
+        )}
         <div ref={waveformRef} className="w-60" />
-          <p>{formatTime(recordingDuration)}</p>
-        {!isRecording
-          ? <FaMicrophone onClick={handleStartRecording} className="cursor-pointer text-red-500" />
-          : <FaStop onClick={handleStopRecording} className="cursor-pointer text-red-500" />
-        }
-        <MdSend onClick={handleAudioSend} className="cursor-pointer" title="Send recording" />
+        <p>{formatTime(recordingDuration)}</p>
+        {!isRecording ? (
+          <FaMicrophone onClick={handleStartRecording} className="cursor-pointer text-red-500" />
+        ) : (
+          <FaStop onClick={handleStopRecording} className="cursor-pointer text-red-500" />
+        )}
+        {!isRecording && (
+          <MdSend onClick={handleAudioSend} className="cursor-pointer" title="Send recording" />
+        )}
         <audio ref={audioRef} src={recordedAudioUrl || undefined} hidden />
-      
       </div>
     </div>
   );
