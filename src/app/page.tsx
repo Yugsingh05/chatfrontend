@@ -47,7 +47,11 @@ export default function Home() {
 
   useEffect(() => {
     if (data) {
-      socket.current = io(HOST);
+      socket.current = io(HOST,{
+        withCredentials: true,
+        transports: ["websocket"],
+
+      });
       socket.current.emit("add-user", data.id);
       setContextSocket(socket.current);
       setSocketEvent(false);
