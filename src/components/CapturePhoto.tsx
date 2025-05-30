@@ -5,50 +5,79 @@ type Props = {
   setImage: React.Dispatch<React.SetStateAction<string>>;
   setShowCapture: React.Dispatch<React.SetStateAction<boolean>>;
 };
+
 const CapturePhoto = ({ setImage, setShowCapture }: Props) => {
-  const videoRef = useRef(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
 
   useEffect(() => {
     let stream: MediaStream;
     const startCamera = async () => {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true ,audio:false});
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
         if (videoRef.current) {
-          (videoRef.current as HTMLVideoElement).srcObject = stream;
+          videoRef.current.srcObject = stream;
         }
+      } catch (err) {
+        console.error("Error accessing camera:", err);
+        setShowCapture(false); // Close modal on error
+      }
     };
     startCamera();
+
     return () => {
-     
-        stream?.getTracks().forEach((track) => track.stop());
-      
-    }
-  },[])
+      stream?.getTracks().forEach((track) => track.stop());
+    };
+  }, [setShowCapture]);
 
   const capturePhoto = () => {
+    const video = videoRef.current;
+    if (!video) return;
+
     const canvas = document.createElement("canvas");
-    if (videoRef.current) {
-      canvas.getContext("2d")?.drawImage(videoRef.current, 0, 0, 300, 150);
+    // Set canvas size to video dimensions for better quality
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const dataUrl = canvas.toDataURL("image/jpeg");
+      setImage(dataUrl);
+      setShowCapture(false);
     }
-    setImage(canvas.toDataURL("image/jpeg"));
-    setShowCapture(false);
   };
 
+
   return (
-    <div className="absolute h-4/6 w-2/6 top-1/4 left-1/3 bg-gray-900 gap-3 rounded-lg pt-2 flex items-center justify-center">
-      <div className="flex flex-col gap-4 w-full items-center justify-center">
-        <div
-          className="pt-2 pr-2 cursor-pointer flex items-end justify-end "
-          onClick={() => setShowCapture(false)}
-        >
-          <IoClose className="h-10 w-10 " />
-        </div>
-        <div className="flex justify-center">
-          <video ref={videoRef} id="video" width={400} autoPlay></video>
-        </div>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Capture photo modal"
+      className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-50 overflow-auto"
+    >
+      <div className="relative bg-gray-900 rounded-lg w-full max-w-md mx-auto p-4 flex flex-col items-center">
         <button
-          className="h-16 w-16 bg-white rounded-full cursor-pointer border-8 border-teal-light p-2 mb-10 "
+          aria-label="Close capture photo"
+          onClick={() => setShowCapture(false)}
+          className="absolute top-2 right-2 text-white hover:text-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 rounded bg-teal-400"
+        >
+          <IoClose className="h-8 w-8 " onClick={() => setShowCapture(false)} />
+        </button>
+
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className="w-full rounded-md max-h-[60vh] object-cover"
+        ></video>
+
+        <button
           onClick={capturePhoto}
-        ></button>
+          className="mt-6 h-16 w-16 rounded-full border-8 border-teal-400 bg-white shadow-lg hover:bg-teal-100 focus:outline-none focus:ring-4 focus:ring-teal-400"
+          aria-label="Capture photo"
+          title="Capture photo"
+        />
       </div>
     </div>
   );

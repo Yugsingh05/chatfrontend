@@ -158,7 +158,7 @@ export default function Home() {
             />
             {currentChatUser ? (
               <div className={searchMessages ? "grid grid-cols-2" : "grid-cols-2"}>
-                <Chat />
+                <Chat   onSearchClick={() => {}}/>
                 {searchMessages && <MessageSearch />}
               </div>
             ) : (
