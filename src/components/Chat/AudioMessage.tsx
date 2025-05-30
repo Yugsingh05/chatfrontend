@@ -3,6 +3,7 @@ import { Play, Pause } from "lucide-react";
 import MessageStatus from "./MessageStatus";
 import { calculateTime } from "@/utils/CalculateTime";
 import { MessageType } from "./ChatContainer";
+import { HOST } from "@/utils/ApiRoutes";
 
 function AudioMessage({ message, isOutgoing }: { message: MessageType; isOutgoing: boolean }) {
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -101,7 +102,7 @@ function AudioMessage({ message, isOutgoing }: { message: MessageType; isOutgoin
         {/* Hidden audio element */}
         <audio ref={audioRef} preload="metadata">
           <source
-            src={`http://localhost:3005/${message.message}`}
+            src={`${HOST}/${message.message}`}
             type="audio/mpeg"
           />
           Your browser does not support the audio element.

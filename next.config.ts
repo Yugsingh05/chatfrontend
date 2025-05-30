@@ -7,7 +7,8 @@ const nextConfig: NextConfig = {
     domains: [
       "lh3.googleusercontent.com",
       "cdn.pixabay.com",
-      "localhost"
+      "localhost",
+      "chatserver-production-4988.up.railway.app"
     ]
   }
 
