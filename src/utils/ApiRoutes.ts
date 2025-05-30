@@ -1,4 +1,5 @@
-export const HOST = "chatserver-production-4988.up.railway.app";///localhost:3005
+export const HOST =  "https://chatserver-production-4988.up.railway.app" 
+//||"chatserver-production-4988.up.railway.app" ;/// "http://localhost:3005"
 
 const AUTH_ROUTES = `${HOST}/api/auth`;
 const MESSAGE_ROUTES = `${HOST}/api/message`;
