@@ -63,30 +63,34 @@ const Page = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen w-full px-4 bg-panel-header-background gap-6">
+<div className="flex flex-col items-center justify-center min-h-screen w-full px-4 bg-panel-header-background gap-10">
       {/* Responsive container */}
-      <div className="flex flex-col md:flex-row items-center justify-center gap-6 w-full max-w-4xl">
-        <div className="relative w-48 h-48 md:w-72 md:h-72 flex-shrink-0">
+      <div className="flex flex-col-reverse md:flex-row items-center justify-center gap-10 w-full max-w-6xl">
+        {/* Heading */}
+        <h1 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-center md:text-left font-mono">
+          Welcome Again to Converssa
+        </h1>
+
+        {/* Logo */}
+        <div className="relative w-40 h-40 sm:w-52 sm:h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 flex-shrink-0">
           <Image
-            src="/whatsapp.gif"
-            alt="whatsapp"
+            src="/logo.png"
+            alt="logo"
             fill
             style={{ objectFit: "contain" }}
             priority
           />
         </div>
-        <h1 className="text-white text-4xl md:text-7xl font-bold select-none">
-          Whatsapp
-        </h1>
       </div>
 
+      {/* Google Sign-In Button */}
       <button
         onClick={handleLogin}
-        className="flex items-center justify-center gap-3 bg-search-input-container-background hover:bg-search-input-container-background-hover transition-colors duration-200 px-6 py-4 rounded-lg shadow-md max-w-xs w-full md:max-w-sm"
+        className="flex items-center justify-center gap-3 bg-search-input-container-background hover:bg-search-input-container-background-hover transition-colors duration-200 px-6 py-3 rounded-lg shadow-md w-full max-w-xs sm:max-w-sm cursor-pointer"
         aria-label="Sign in with Google"
       >
-        <FcGoogle className="text-4xl" />
-        <span className="text-white text-lg md:text-2xl font-semibold">
+        <FcGoogle className="text-2xl sm:text-3xl md:text-4xl" />
+        <span className="text-white text-base sm:text-lg md:text-xl font-semibold">
           Sign in with Google
         </span>
       </button>

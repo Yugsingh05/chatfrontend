@@ -43,32 +43,43 @@ const Register = () => {
   };
 
   return (
-    <div className="bg-panel-header-background min-h-screen w-full flex flex-col items-center justify-center text-white px-4 py-8">
-      <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 max-w-5xl w-full">
-        <div className="flex items-center justify-center gap-2">
-          <Image src="/whatsapp.gif" width={200} height={200} alt="whatsapp" />
-          <span className="text-5xl md:text-7xl font-bold select-none">Whatsapp</span>
+    <div className="bg-panel-header-background min-h-screen w-full flex items-center justify-center text-white px-4 py-8">
+      <div className="flex flex-col items-center text-center gap-4 max-w-5xl w-full">
+        <div className="flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 w-full">
+          <div className="flex items-center justify-center gap-2">
+             <Image
+                        src="/logo.png"
+                        alt="logo"
+                        width={150}
+                        height={150}
+                        style={{ objectFit: "contain" }}
+                        priority
+                      />
+            <span className="text-4xl md:text-6xl font-bold select-none -mt-5">converssa</span>
+          </div>
         </div>
+
         <h2 className="text-xl md:text-2xl font-semibold">Create your profile</h2>
-      </div>
 
-      <div className="flex flex-col md:flex-row items-start md:items-center justify-center gap-10 mt-8 max-w-4xl w-full">
-        {/* Inputs */}
-        <div className="flex flex-col gap-6 flex-1 max-w-md w-full">
-          <Input name="Display Name" state={name} setState={setName} label={true} />
-          <Input name="About" state={about} setState={setAbout} label={true} />
-          <button
-            onClick={handleCreate}
-            className="bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors duration-200 w-full md:w-auto"
-          >
-            Create Profile
-          </button>
+        <div className="flex flex-col md:flex-row items-center justify-center gap-10 mt-6 w-full max-w-4xl">
+          {/* Inputs */}
+          <div className="flex flex-col gap-6 w-full max-w-md">
+            <Input name="Display Name" state={name} setState={setName} label={true} />
+            <Input name="About" state={about} setState={setAbout} label={true} />
+          </div>
+
+          {/* Avatar */}
+          <div className="flex justify-center">
+            <Avatar type="xl" image={image} setImage={setImage} />
+          </div>
         </div>
 
-        {/* Avatar */}
-        <div className="flex justify-center flex-shrink-0">
-          <Avatar type="xl" image={image} setImage={setImage} />
-        </div>
+        <button
+          onClick={handleCreate}
+          className="bg-black text-white py-3 px-8 mt-6 rounded-lg font-semibold hover:bg-gray-800 transition-colors duration-200 w-full max-w-xs"
+        >
+          Create Profile
+        </button>
       </div>
     </div>
   );
