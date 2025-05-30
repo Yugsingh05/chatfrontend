@@ -1,4 +1,7 @@
 "use client";
+import { useEffect, useRef, useState } from "react";
+import { io } from "socket.io-client";
+import type { Socket } from "socket.io-client";
 import IncomingVideoCall from "@/components/Call/IncomingVideoCall";
 import IncomingVoiceCall from "@/components/Call/IncomingVoiceCall";
 import AudioCall from "@/components/Chat/AudioCall";
@@ -11,9 +14,6 @@ import { useChatReducer } from "@/context/ChatContext";
 import { useSocketReducer } from "@/context/SocketContext";
 import { useStateProvider } from "@/context/StateContext";
 import { HOST } from "@/utils/ApiRoutes";
-import { useEffect, useRef, useState } from "react";
-import { io } from "socket.io-client";
-import type { Socket } from "socket.io-client";
 
 export default function Home() {
   const { data } = useStateProvider();
@@ -30,43 +30,44 @@ export default function Home() {
     EndCall,
     setOnlineUsers,
   } = useChatReducer();
-
   const { setContextSocket } = useSocketReducer();
 
   const socket = useRef<Socket | null>(null);
   const [socketEvent, setSocketEvent] = useState(false);
 
-  // 🔁 Refs to keep latest values
+  // Mobile navigation state
+  const [mobileView, setMobileView] = useState<"chatlist" | "chat" | "search">("chatlist");
+
   const currentChatUserRef = useRef(currentChatUser);
   const dataRef = useRef(data);
 
   useEffect(() => {
     currentChatUserRef.current = currentChatUser;
     dataRef.current = data;
+
+    if (window.innerWidth < 768) {
+      setMobileView(currentChatUser ? "chat" : "chatlist");
+    }
   }, [currentChatUser, data]);
 
   useEffect(() => {
     if (data) {
-      socket.current = io(HOST,{
+      socket.current = io(HOST, {
         withCredentials: true,
         transports: ["websocket"],
-
       });
       socket.current.emit("add-user", data.id);
       setContextSocket(socket.current);
       setSocketEvent(false);
     }
-  }, [data,setContextSocket]);
+  }, [data, setContextSocket]);
 
   useEffect(() => {
     if (socket.current && !socketEvent) {
       const sock = socket.current;
 
-      // 📨 Message Received
       sock.on("msg-receive", (mess) => {
-      
         setChatMessages((prev) => [...prev, mess.message]);
-
         const currentChat = currentChatUserRef.current;
         const userData = dataRef.current;
 
@@ -79,12 +80,9 @@ export default function Home() {
             userId: userData.id,
             senderId: currentChat?.id,
           });
-        } else {
-          console.warn("Socket not connected or condition not met");
         }
       });
 
-      // 📞 Call Events
       sock.on("incoming-voice-call", ({ from, roomId, callType }) => {
         setIncomingVoiceCall({ ...from, roomId, callType });
       });
@@ -93,23 +91,14 @@ export default function Home() {
         setIncomingVideoCall({ ...from, roomId, callType });
       });
 
-      sock.on("voice-call-rejected", () => {
-        EndCall();
-      });
+      sock.on("voice-call-rejected", EndCall);
+      sock.on("video-call-rejected", EndCall);
 
-      sock.on("video-call-rejected", () => {
-        console.log("Video call rejected");
-        EndCall();
-      });
-
-      // ✅ Online Users
       sock.on("online-users", ({ onlineUsers }) => {
         setOnlineUsers(onlineUsers);
       });
 
-      // ✅ Mark Message As Read
-      sock.on("mark-as-read", ({ userId, success }) => {
-        console.log("Mark as read:", userId, success);
+      sock.on("mark-as-read", ({ success }) => {
         if (success) {
           setChatMessages((prev) =>
             prev.map((msg) =>
@@ -132,52 +121,79 @@ export default function Home() {
     setOnlineUsers,
   ]);
 
-useEffect(() => {
-  if (
-    socket.current &&
-    socket.current.connected &&
-    currentChatUser &&
-    data?.id
-  ) {
-    console.log("Emitting mark-as-read-by-receiver");
-
-    socket.current.emit("mark-as-read-by-receiver", {
-      userId: data.id, // receiver (current logged-in user)
-      senderId: currentChatUser.id, // the person you're chatting with
-    });
-  }
-}, [currentChatUser, data?.id]);
+  useEffect(() => {
+    if (
+      socket.current &&
+      socket.current.connected &&
+      currentChatUser &&
+      data?.id
+    ) {
+      socket.current.emit("mark-as-read-by-receiver", {
+        userId: data.id,
+        senderId: currentChatUser.id,
+      });
+    }
+  }, [currentChatUser, data?.id]);
 
   return (
     <>
       {Incoming_Video_Call && <IncomingVideoCall />}
       {Incoming_Voice_Call && <IncomingVoiceCall />}
-
       {videoCall && (
-        <div className="h-screen w-screen max-h-full overflow-hidden">
+        <div className="h-screen w-screen overflow-hidden">
           <VideoCall />
         </div>
       )}
-
       {audioCall && (
-        <div className="h-screen w-screen max-h-full overflow-hidden">
+        <div className="h-screen w-screen overflow-hidden">
           <AudioCall />
         </div>
       )}
 
-      {!videoCall && !audioCall && (
-        <div className="grid grid-cols-main h-screen w-screen max-h-screen max-w-screen overflow-hidden">
-          <ChatList  />
-          {currentChatUser ? (
-            <div
-              className={searchMessages ? "grid grid-cols-2" : "grid-cols-2"}
-            >
-              <Chat />
-              {searchMessages && <MessageSearch />}
-            </div>
-          ) : (
-            <Empty />
-          )}
+     {!videoCall && !audioCall && (
+        <div className="h-screen w-full overflow-hidden">
+          {/* Desktop layout */}
+          <div className="hidden md:grid grid-cols-main h-full w-full">
+            <ChatList 
+            />
+            {currentChatUser ? (
+              <div className={searchMessages ? "grid grid-cols-2" : "grid-cols-2"}>
+                <Chat />
+                {searchMessages && <MessageSearch />}
+              </div>
+            ) : (
+              <Empty />
+            )}
+          </div>
+
+          {/* Mobile layout */}
+          <div className="block md:hidden h-full w-full">
+            {mobileView === "chatlist" && (
+              <ChatList
+                onChatSelect={() => setMobileView("chat")}
+                
+              />
+            )}
+            {mobileView === "chat" && (
+              <div className="relative h-full">
+                <button
+                  className="absolute top-2 left-2 z-10 bg-white px-3 py-1 rounded shadow"
+                  onClick={() => setMobileView("chatlist")}
+                >
+                  ← Back
+                </button>
+                <Chat 
+                  onSearchClick={() => setMobileView("search")} // e.g., a search button inside chat UI
+                />
+              </div>
+            )}
+            {mobileView === "search" && (
+              <div className="relative h-full">
+                {/* Pass onClose to switch back to chat or chatlist */}
+                <MessageSearch onClose={() => setMobileView(currentChatUser ? "chat" : "chatlist")} />
+              </div>
+            )}
+          </div>
         </div>
       )}
     </>

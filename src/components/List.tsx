@@ -27,7 +27,11 @@ type ContactUserType = {
   type: string;
 };
 
-export const List = () => {
+interface ListProps {
+  onChatSelect?: () => void;
+}
+
+export const List: React.FC<ListProps> = ({ onChatSelect }) => {
   const { data } = useStateProvider();
   const {
     setUserContacts,
@@ -41,9 +45,7 @@ export const List = () => {
 
   const { ContextSocket } = useSocketReducer();
   const [loading, setLoading] = useState(false);
-  const [searchedContacts, setSearchedContacts] = useState<ContactUserType[]>(
-    []
-  );
+  const [searchedContacts, setSearchedContacts] = useState<ContactUserType[]>([]);
 
   useEffect(() => {
     const getContacts = async () => {
@@ -73,7 +75,7 @@ export const List = () => {
 
   useEffect(() => {
     if (searchedUsers?.trim() && userContacts?.length) {
-      const filtered = (userContacts).filter((contact) =>
+      const filtered = userContacts.filter((contact) =>
         contact.name.toLowerCase().includes(searchedUsers.toLowerCase())
       );
       setSearchedContacts(filtered);
@@ -83,8 +85,8 @@ export const List = () => {
   }, [searchedUsers, userContacts]);
 
   const handleClick = (user: ContactUserType) => {
-   console.log("user",user);
-   const {id , about , name , profileImage , email } = user
+    const { id, about, name, profileImage, email } = user;
+
     setCurrentChatUser({
       id,
       about,
@@ -92,9 +94,9 @@ export const List = () => {
       profileImage,
       email,
       status: true,
-      isNewUser: false
-
+      isNewUser: false,
     });
+
     setUserContacts((prevContacts) =>
       prevContacts.map((contact) =>
         contact.id === user.id
@@ -102,49 +104,53 @@ export const List = () => {
           : contact
       )
     );
+
+    // Switch to chat view on mobile (if handler is provided)
+    onChatSelect?.();
   };
 
-  const contactList = searchedUsers
-    ? searchedContacts as ContactUserType[]
-    : userContacts ;
+  const contactList = searchedUsers ? (searchedContacts as ContactUserType[]) : userContacts;
 
- useEffect(() => {
-  if (!ContextSocket) return;
+  useEffect(() => {
+    if (!ContextSocket) return;
 
-  const handleMessageReceive = (data : {message : MessageType , type : string , totalUnreadMessages : number}) => {
- 
-    setUserContacts((prevContacts) =>
-      prevContacts.map((contact) => {
-        const isCurrentChatUser = currentChatUser?.id === contact.id;
-        const isSender = contact.id === data.message.senderId;
+    const handleMessageReceive = (data: { message: MessageType; type: string; totalUnreadMessages: number }) => {
+      setUserContacts((prevContacts) =>
+        prevContacts.map((contact) => {
+          const isCurrentChatUser = currentChatUser?.id === contact.id;
+          const isSender = contact.id === data.message.senderId;
 
-        if (!isSender) return contact;
+          if (!isSender) return contact;
 
-        return {
-          ...contact,
-          message: data.message.message,
-          totalUnreadMessages: isCurrentChatUser
-            ? 0
-            : (contact.totalUnreadMessages || 0) + 1,
-            type : data.message.type
-        };
-      })
-    );
-  };
+          return {
+            ...contact,
+            message: data.message.message,
+            totalUnreadMessages: isCurrentChatUser ? 0 : (contact.totalUnreadMessages || 0) + 1,
+            type: data.message.type,
+          };
+        })
+      );
+    };
 
-  ContextSocket?.on("msg-receive", handleMessageReceive);
+    ContextSocket?.on("msg-receive", handleMessageReceive);
 
-  // Clean up the listener when currentChatUser or ContextSocket changes
-  return () => {
-    ContextSocket?.off("msg-receive", handleMessageReceive);
-  };
-}, [ContextSocket, currentChatUser?.id, setUserContacts]);
-
+    return () => {
+      ContextSocket?.off("msg-receive", handleMessageReceive);
+    };
+  }, [ContextSocket, currentChatUser?.id, setUserContacts]);
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-[100vh] bg-conversation-panel-background">
         <LoaderCircle className="text-icon-green animate-spin" size={50} />
+      </div>
+    );
+  }
+
+  if (!contactList?.length) {
+    return (
+      <div className="flex items-center justify-center h-[100vh] bg-conversation-panel-background">
+        <span className="text-white text-primary-strong">No contact found</span>
       </div>
     );
   }

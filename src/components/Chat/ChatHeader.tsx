@@ -8,7 +8,7 @@ import { useChatReducer } from "@/context/ChatContext";
 import { user } from "@/context/StateContext";
 import ContextMenu from "../ContextMenu";
 
-const ChatHeader = () => {
+const ChatHeader = ({onSearchClick} : {onSearchClick: () => void}) => {
   const { currentChatUser, setSearchMessages, setVideoCall, setAudioCall ,setCurrentChatUser,EndCall , onlineUsers} =
     useChatReducer();
   const [dataOfUser, setDataOfUser] = useState<user | undefined>(undefined);
@@ -65,6 +65,17 @@ const ChatHeader = () => {
   return (
     <div className="h-16 px-4 py-3 flex justify-between items-center bg-panel-header-background z-10">
       <div className="flex items-center justify-center gap-6">
+         <button
+          onClick={() => {
+            setCurrentChatUser(undefined);
+            setSearchMessages(false);
+          }}  
+          className=" md:hidden bg-blue-500/80 rounded shadow  text-white text-4xl px-2 pb-2 h-7.5 w-10 flex items-center justify-center"
+          aria-label="Back"
+        >
+          ←
+        </button>
+        
         <Avatar
           type="sm"
           image={dataOfUser?.profileImage || "/default_avatar.png"}
@@ -92,7 +103,10 @@ const ChatHeader = () => {
         <BiSearchAlt2
           className="text-panel-header-icon text-xl cursor-pointer"
           title="Search"
-          onClick={() => setSearchMessages((prev) => !prev)}
+          onClick={() =>{
+             setSearchMessages((prev) => !prev);
+             onSearchClick();
+          }}
         />
         <BsThreeDotsVertical
           className="text-panel-header-icon text-xl cursor-pointer"

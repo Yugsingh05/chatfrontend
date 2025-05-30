@@ -4,15 +4,20 @@ import { SearchBar } from "./SearchBar";
 import { List } from "./List";
 import ContactList from "./Chat/ContactList";
 
-const ChatList = () => {
+interface ChatListProps {
+  onChatSelect?: () => void;
+}
+
+const ChatList: React.FC<ChatListProps> = ({ onChatSelect }) => {
   const [isAllContacts, setIsAllContacts] = useState(true);
+
   return (
-    <div className="bg-panel-header-background flex flex-col max-h-screen z-20">
+    <div className="bg-panel-header-background flex flex-col h-full max-h-screen z-20 w-full sm:w-full">
       {isAllContacts ? (
         <>
           <ChatListHeader setContacts={setIsAllContacts} />
           <SearchBar />
-          <List />
+          <List onChatSelect={onChatSelect} />
         </>
       ) : (
         <ContactList setIsAllContacts={setIsAllContacts} />

@@ -8,7 +8,7 @@ import { GET_MESSAGES_ROUTE } from "@/utils/ApiRoutes";
 import { useStateProvider } from "@/context/StateContext";
 import { LoaderCircle } from "lucide-react";
 
-const Chat = () => {
+const Chat = ({onSearchClick} : {onSearchClick: () => void}) => {
   const { currentChatUser, setChatMessages } = useChatReducer();
   const { data } = useStateProvider();
   const [loading, setLoading] = useState(false);
@@ -51,7 +51,7 @@ const Chat = () => {
 
   return (
     <div className="border-conversation-border border-1 w-full bg-conversation-panel-background flex flex-col h-[100vh] border-b-4 border-b-icon-green ">
-      <ChatHeader />
+      <ChatHeader onSearchClick={onSearchClick}/>
       <ChatContainer />
       <MessageBar />
     </div>
