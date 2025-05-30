@@ -4,6 +4,7 @@ import { useStateProvider } from "@/context/StateContext";
 import { BsFillChatLeftTextFill, BsThreeDotsVertical } from "react-icons/bs";
 import ContextMenu from "./ContextMenu";
 import { useSocketReducer } from "@/context/SocketContext";
+import { useChatReducer } from "@/context/ChatContext";
 
 export const ChatListHeader = ({ setContacts } : {setContacts : React.Dispatch<React.SetStateAction<boolean>>}) => {
   const { data, handleLogout } = useStateProvider();
@@ -13,14 +14,17 @@ export const ChatListHeader = ({ setContacts } : {setContacts : React.Dispatch<R
     x: 0,
     y: 0,
   });
-
+  const {EmptyData} = useChatReducer()
   const ContextMenuOptions = [
     {
       name: "Logout",
       callback: () => {
         handleLogout();
+
         ContextSocket?.emit("logout", { userId: data.id });
+        
         setContextMenuVisible(false);
+        EmptyData();
       },
     },
   ];

@@ -15,6 +15,7 @@ const Register = () => {
   const [about, setAbout] = useState("");
   const [image, setImage] = useState(data?.profileImage || "/default_avatar.png");
   const router = useRouter();
+  const [loading,setloading] = useState(false)
 
   useEffect(() => {
     if (!data.email) {
@@ -26,6 +27,7 @@ const Register = () => {
     const email = data?.email;
     if (!email || !name || !about || !image) return alert("All fields are required");
     try {
+      setloading(true)
       const res = await axios.post(REGISTER_USER_ROUTE, { email, name, about, image });
       setData({
         id: data.id,
@@ -39,6 +41,8 @@ const Register = () => {
       if (res.data.status) router.push("/");
     } catch (error) {
       console.error(error);
+    }finally{
+      setloading(false)
     }
   };
 
@@ -76,9 +80,10 @@ const Register = () => {
 
         <button
           onClick={handleCreate}
+          disabled={loading}
           className="bg-black text-white py-3 px-8 mt-6 rounded-lg font-semibold hover:bg-gray-800 transition-colors duration-200 w-full max-w-xs"
         >
-          Create Profile
+         {loading ? "Loading..." : "Create Profile"}
         </button>
       </div>
     </div>

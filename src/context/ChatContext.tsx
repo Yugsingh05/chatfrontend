@@ -3,8 +3,6 @@ import { createContext, useContext, useState } from "react";
 import { user } from "./StateContext";
 import { MessageType } from "@/components/Chat/ChatContainer";
 
-
-
 type ContactUserType = {
   about: string;
   createdAt: string;
@@ -28,17 +26,16 @@ export type IncomingCall = {
   callType: "audio" | "video";
   type: "in-coming" | "out-going";
   roomId: number;
-}
+};
 
 export type Call = {
-  id : string;
-  name : string;
-  profileImage : string;
-  callType : "audio" | "video";
-  type : "in-coming" | "out-going";
-  roomId : number;
-}
-
+  id: string;
+  name: string;
+  profileImage: string;
+  callType: "audio" | "video";
+  type: "in-coming" | "out-going";
+  roomId: number;
+};
 
 type ChatContextType = {
   currentChatUser: user | undefined;
@@ -59,15 +56,22 @@ type ChatContextType = {
   setAudioCall: React.Dispatch<React.SetStateAction<Call | undefined>>;
   EndCall: () => void;
   Incoming_Voice_Call: IncomingCall | undefined;
-  setIncomingVoiceCall: React.Dispatch<React.SetStateAction<IncomingCall | undefined>>;
+  setIncomingVoiceCall: React.Dispatch<
+    React.SetStateAction<IncomingCall | undefined>
+  >;
   Incoming_Video_Call: IncomingCall | undefined;
-  setIncomingVideoCall: React.Dispatch<React.SetStateAction<IncomingCall | undefined>>;
+  setIncomingVideoCall: React.Dispatch<
+    React.SetStateAction<IncomingCall | undefined>
+  >;
+  EmptyData: () => void;
 };
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
 
 const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
-  const [currentChatUser, setCurrentChatUser] = useState<user | undefined>(undefined);
+  const [currentChatUser, setCurrentChatUser] = useState<user | undefined>(
+    undefined
+  );
   const [ChatMessages, setChatMessages] = useState<MessageType[]>([]);
   const [searchMessages, setSearchMessages] = useState(false);
   const [userContacts, setUserContacts] = useState<ContactUserType[]>([]);
@@ -76,15 +80,26 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [videoCall, setVideoCall] = useState<Call | undefined>(undefined);
   const [audioCall, setAudioCall] = useState<Call | undefined>(undefined);
 
-  const [Incoming_Voice_Call, setIncomingVoiceCall] = useState<IncomingCall | undefined>(undefined);
-  const [Incoming_Video_Call, setIncomingVideoCall] = useState<IncomingCall | undefined>(undefined);
+  const [Incoming_Voice_Call, setIncomingVoiceCall] = useState<
+    IncomingCall | undefined
+  >(undefined);
+  const [Incoming_Video_Call, setIncomingVideoCall] = useState<
+    IncomingCall | undefined
+  >(undefined);
 
   const EndCall = () => {
     setVideoCall(undefined);
     setAudioCall(undefined);
     setIncomingVoiceCall(undefined);
     setIncomingVideoCall(undefined);
-    
+  };
+
+  const EmptyData = () => {
+    setCurrentChatUser(undefined);
+    setChatMessages([]);
+    setSearchMessages(false);
+    setUserContacts([]);
+    setOnlineUsers([]);
   };
 
   return (
@@ -111,6 +126,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
         setIncomingVoiceCall,
         Incoming_Video_Call,
         setIncomingVideoCall,
+        EmptyData,
       }}
     >
       {children}
@@ -118,29 +134,7 @@ const ChatContextProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const useChatReducer = (): {
-  currentChatUser: user | undefined;
-  setCurrentChatUser: React.Dispatch<React.SetStateAction<user | undefined>>;
-  ChatMessages: MessageType[];
-  setChatMessages: React.Dispatch<React.SetStateAction<MessageType[]>>;
-  searchMessages: boolean;
-  setSearchMessages: React.Dispatch<React.SetStateAction<boolean>>;
-  userContacts: ContactUserType[];
-  setUserContacts: React.Dispatch<React.SetStateAction<ContactUserType[]>>;
-  onlineUsers: string[];
-  setOnlineUsers: React.Dispatch<React.SetStateAction<string[]>>;
-  searchedUsers: string;
-  setSearchedUsers: React.Dispatch<React.SetStateAction<string>>;
-  videoCall: Call | undefined;
-  setVideoCall: React.Dispatch<React.SetStateAction<Call | undefined>>;
-  audioCall: Call | undefined;
-  setAudioCall: React.Dispatch<React.SetStateAction<Call | undefined>>;
-  EndCall: () => void;
-  Incoming_Voice_Call: IncomingCall | undefined;
-  setIncomingVoiceCall: React.Dispatch<React.SetStateAction<IncomingCall | undefined>>;
-  Incoming_Video_Call: IncomingCall | undefined;
-  setIncomingVideoCall: React.Dispatch<React.SetStateAction<IncomingCall | undefined>>;
-} => {
+const useChatReducer = (): ChatContextType => {
   const context = useContext(ChatContext);
   if (!context) {
     throw new Error("useChatReducer must be used within a ChatContextProvider");
