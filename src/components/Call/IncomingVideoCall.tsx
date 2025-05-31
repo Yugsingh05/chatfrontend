@@ -10,12 +10,14 @@ const IncomingVideoCall = () => {
 
   const acceptCall = () => {
     console.log("Incoming_Video_Call", Incoming_Video_Call);
-    if (Incoming_Video_Call && typeof Incoming_Video_Call === "object") {
+    if (Incoming_Video_Call && Incoming_Video_Call.id) {
+      console.log("Incoming_Video_Call", Incoming_Video_Call);
       setVideoCall({ ...Incoming_Video_Call, type: "in-coming" });
     }
 
     ContextSocket?.emit("accept-incoming-call", { id: Incoming_Video_Call?.id });
     setIncomingVideoCall(undefined);
+    
   };
 
   const rejectCall = () => {

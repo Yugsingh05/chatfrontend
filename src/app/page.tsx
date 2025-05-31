@@ -88,6 +88,7 @@ export default function Home() {
       });
 
       sock.on("incoming-video-call", ({ from, roomId, callType }) => {
+        console.log("incoming-video-call", { from, roomId, callType });
         setIncomingVideoCall({ ...from, roomId, callType });
       });
 

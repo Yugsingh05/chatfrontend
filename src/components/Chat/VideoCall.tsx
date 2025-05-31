@@ -12,6 +12,8 @@ const VideoCall = () => {
 
     useEffect(() => {
         if ( videoCall && videoCall.type === "out-going") {
+
+          console.error(videoCall);
           ContextSocket?.emit("outgoing-video-call", {
             to : videoCall.id,
             from : data,

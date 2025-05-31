@@ -64,7 +64,7 @@ const Container = ({ CallData }: { CallData: Call }) => {
     } else {
       setCallAccepted(true);
     }
-  }, [CallData.type]);
+  }, [CallData.type, ContextSocket]);
 
   // Fetch ZEGO token
   useEffect(() => {
@@ -82,7 +82,7 @@ const Container = ({ CallData }: { CallData: Call }) => {
     };
 
     if (!token && callAccepted) getToken();
-  }, [callAccepted]);
+  }, [callAccepted, data.id, token]);
 
   // Initialize ZEGO SDK and manage streams
   useEffect(() => {
@@ -249,7 +249,7 @@ const Container = ({ CallData }: { CallData: Call }) => {
         }
       });
     };
-  }, [token, callAccepted]);
+  }, [token, callAccepted, CallData, data.id, data.name]);
 
   return (
     <div className="relative w-full h-screen bg-black flex flex-col items-center justify-center text-white">
